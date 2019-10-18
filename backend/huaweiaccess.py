@@ -20,7 +20,7 @@ SMS_LIST_TEMPLATE = '''<request>
 SMS_DEL_TEMPLATE = '<request><Index>{index}</Index></request>'
 
 SMS_SEND_TEMPLATE = '''<request>
-    <Index>{index}</Index>
+    <Index>-1</Index>
     <Phones><Phone>{phone}</Phone></Phones>
     <Sca></Sca>
     <Content>{content}</Content>
@@ -124,14 +124,17 @@ def getFirstUnreadMessage(headers):
     }
     return message
 
-def sendMessage(headers, apiData): #TODO
+def sendMessage(headers, apiData):
     print(apiData.json())
-    #r = requests.post(url=SEND_SMS_ACTION, data=SMS_SEND_TEMPLATE.format(index=index), headers=headers)
+    jsonData = apiData.json()
+    content = jsonData["feedbackMessage"];
+    data = SMS_SEND_TEMPLATE.format(
+        phone = jsonData["phoneNumber"],
+        content = content,
+        length = len(content),
+        timestamp = datetime.date.today().strftime("%Y-%m-%d %T")
+    )
+    r = requests.post(url=SEND_SMS_ACTION, data=data, headers=headers)
 
 def deleteMessage(headers, index):
     r = requests.post(url=DELETE_SMS_ACTION, data=SMS_DEL_TEMPLATE.format(index=index), headers=headers)
-
-if __name__ == "__main__":
-
-    
-

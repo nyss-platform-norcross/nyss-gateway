@@ -12,7 +12,6 @@ from huaweiaccess import *
 API_URL = "http://ccce053a.ngrok.io/api/SmsGateway/"
 API_KEY = "7d956fc0-4a88-4600-88c1-aae478eca9b8"
 INPUT_MESSAGE_FILE_PATH = "input_messages.txt"
-OUTPUT_MESSAGE_FILE_PATH = "output_messages.txt"
 ERROR_MESSAGE_FILE_PATH = "error_messages.txt"
 
 
