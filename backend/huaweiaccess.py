@@ -6,6 +6,7 @@ import xmltodict
 import requests
 import json
 import time
+import datetime
 # import sendEmail
 
 SMS_LIST_TEMPLATE = '''<request>
@@ -80,37 +81,39 @@ def getHeaders():
         pass
     return headers
     
-def unlockWithPin(headers, pin):
-    r = requests.post(url = PIN_OPERATE_ACTION, data = PIN_SET_TEMPLATE.format(0, pin, '', ''), headers = headers)
+def unlockWithPin(pin):
+    r = requests.post(url = PIN_OPERATE_ACTION, data = PIN_SET_TEMPLATE.format(0, pin, '', ''), headers = getHeaders())
     d = xmltodict.parse(r.text, xml_attribs=True)
     if d['response'] != "OK":
         print("Unexpected Response when unlocking with Pin")
         return False
     return True
 
-def isPinRequired(headers):
-    r = requests.get(url = PIN_STATUS_ACTION, headers = headers)
-    d = xmltodict.parse(r.text, xml_attribs=True)
-    if (d['response']['SimState']) == "260":
-        return True
-    else:
-        return False
+def isPinRequired():
+    return False
+    # r = requests.get(url = PIN_STATUS_ACTION, headers = getHeaders())
+    # d = xmltodict.parse(r.text, xml_attribs=True)
+    # print(d)
+    # if (d['response']['SimState']) == "260":
+    #     return True
+    # else:
+    #     return False
 
-def disablePin(headers, pin):
-    r = requests.post(url = PIN_OPERATE_ACTION, data = PIN_SET_TEMPLATE.format(2, pin, '', ''), headers = headers)
+def disablePin(pin):
+    r = requests.post(url = PIN_OPERATE_ACTION, data = PIN_SET_TEMPLATE.format(2, pin, '', ''), headers = getHeaders())
     d = xmltodict.parse(r.text, xml_attribs=True)
     if d['response'] != "OK":
         print("Unexpected Response when disableing Pin")
         print(d)
 
-def getUnreadMessageCount(headers):
-    r = requests.get(url=NOTIFICATION_ACTION, headers=headers)
+def getUnreadMessageCount():
+    r = requests.get(url=NOTIFICATION_ACTION, headers=getHeaders())
     d = xmltodict.parse(r.text, xml_attribs=True)
     count = int(d['response']['UnreadMessage'])
     return count
 
-def getFirstUnreadMessage(headers):
-    r = requests.post(url=SMS_LIST_ACTION, data=SMS_LIST_TEMPLATE, headers=headers)
+def getFirstUnreadMessage():
+    r = requests.post(url=SMS_LIST_ACTION, data=SMS_LIST_TEMPLATE, headers=getHeaders())
     d = xmltodict.parse(r.text, xml_attribs=True)
     count = int(d['response']['Count'])
     data = d['response']['Messages']['Message']
@@ -124,7 +127,7 @@ def getFirstUnreadMessage(headers):
     }
     return message
 
-def sendMessage(headers, apiData):
+def sendMessage(apiData):
     print(apiData.json())
     jsonData = apiData.json()
     content = jsonData["feedbackMessage"];
@@ -134,7 +137,7 @@ def sendMessage(headers, apiData):
         length = len(content),
         timestamp = datetime.date.today().strftime("%Y-%m-%d %T")
     )
-    r = requests.post(url=SEND_SMS_ACTION, data=data, headers=headers)
+    r = requests.post(url=SEND_SMS_ACTION, data=data, headers=getHeaders())
 
-def deleteMessage(headers, index):
-    r = requests.post(url=DELETE_SMS_ACTION, data=SMS_DEL_TEMPLATE.format(index=index), headers=headers)
+def deleteMessage(index):
+    r = requests.post(url=DELETE_SMS_ACTION, data=SMS_DEL_TEMPLATE.format(index=index), headers=getHeaders())

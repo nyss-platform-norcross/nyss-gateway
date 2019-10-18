@@ -50,7 +50,7 @@ class myHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
-            if not self.pinSet:
+            if not huaweiaccess.isPinRequired():
                 self.wfile.write(b'{"required": true}')
             else:
                 self.wfile.write(b'{"required": false}')
@@ -122,19 +122,19 @@ class myHandler(http.server.BaseHTTPRequestHandler):
             return
         
         try:
-            if not huaweiaccess.isPinRequired(huaweiaccess.getHeaders()):
+            if not huaweiaccess.isPinRequired():
                 self.send_response(400)
                 self.end_headers()
                 self.wfile.write(b'Pin Code Not Required!')
                 return
             log.debug("Trying pin code {}".format(pin))
 
-            if not huaweiaccess.unlockWithPin(huaweiaccess.getHeaders(), pin):
+            if not huaweiaccess.unlockWithPin(pin):
                 self.send_response(400)
                 self.end_headers()
                 self.wfile.write(b'Unlocking failed...')
                 return
-            if not huaweiaccess.disablePin(huaweiaccess.getHeaders(), pin):
+            if not huaweiaccess.disablePin(pin):
                 self.send_response(400)
                 self.end_headers()
                 self.wfile.write(b'Disableing failed...')
@@ -150,17 +150,38 @@ class myHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(503)
             self.end_headers()
 
-
-with socketserver.TCPServer(("", PORT), myHandler) as httpd:
-    print("serving at port", PORT)
-    httpd.serve_forever()
+def startHttpServer():
+    log.debug("Starting http server!")
+    with socketserver.TCPServer(("", PORT), myHandler) as httpd:
+        print("serving at port", PORT)
+        httpd.serve_forever()
 
 def startSmsHandler():
-    while huaweiaccess.isPinRequired():
-        time.sleep(5)
+    log.debug("Starting SMS Handler!")
+    required = True
+    count = 0
+    while huaweiaccess.isPinRequired() or required:
+    # while required:
+        time.sleep(1)
+        count = count + 1
+        if count == 5:
+            required = False
+    log.debug("Entering SMS Handler loop")
     smsHandler.runSMSHandler()
 
-threading.Thread(target=startSmsHandler, daemon=True)
+
+httpServer = threading.Thread(target=startHttpServer, daemon=True)
+smsHandlerThread = threading.Thread(target=startSmsHandler, daemon=True)
+
+httpServer.start()
+smsHandlerThread.start()
+# httpServer.join()
+while True:
+    try:
+        time.sleep(1.)
+    except KeyboardInterrupt as err:
+        raise err
+
 # if __name__ == "__main__":
     # log.debug('Starting SMS Gateway backend application')
 

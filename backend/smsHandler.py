@@ -28,15 +28,18 @@ def sendToAPI(data):
     return requests.post(url = API_URL, json = apiMessage) 
 
 def runSMSHandler():
+
+    open(INPUT_MESSAGE_FILE_PATH, 'w+')
+    open(ERROR_MESSAGE_FILE_PATH, 'w+')
     while True:
         time.sleep(3)
 
         #get input messages
-        if getUnreadMessageCount(getHeaders()) != 0:
-            message = getFirstUnreadMessage(getHeaders())
+        if getUnreadMessageCount() != 0:
+            message = getFirstUnreadMessage()
             with open(INPUT_MESSAGE_FILE_PATH, "a+") as file:
                 file.write(json.dumps(message) + "\n");
-            deleteMessage(getHeaders(), message['index'])
+            deleteMessage(message['index'])
 
         #handle input messages
         with open(INPUT_MESSAGE_FILE_PATH, "r") as inputFile:
@@ -44,12 +47,11 @@ def runSMSHandler():
             while rawMessage:
                 response = sendToAPI(json.loads(rawMessage))
                 if (response.status_code == 200):
-                    sendMessage(getHeaders(), response)
+                    sendMessage(response)
                 else:
                     with open(ERROR_MESSAGE_FILE_PATH, "a+") as errorFile:
                         errorFile.write(rawMessage);
                 rawMessage = inputFile.readline()
-        
         #retreive unsend messages
         open(INPUT_MESSAGE_FILE_PATH, 'w').close()
         with open(ERROR_MESSAGE_FILE_PATH, "r") as errorFile:
