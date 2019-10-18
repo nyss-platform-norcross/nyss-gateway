@@ -1,13 +1,22 @@
-import logging
-
-log = logging.getLogger('root')
-
 import http.server
 import socketserver
 from os import curdir, sep
 import cgi
 import json
 import io
+import threading
+import huaweiaccess
+import smsHandler
+import time
+
+import logging
+
+
+logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s')
+log = logging.getLogger('WebServer')
+log.setLevel(logging.DEBUG)
+
+
 
 PORT = 8080
 Handler = http.server.SimpleHTTPRequestHandler
@@ -17,6 +26,21 @@ class myHandler(http.server.BaseHTTPRequestHandler):
     def __init__(self, request, client_address, server):
         super().__init__(request, client_address, server)
         self.pinSet = False
+
+    def _send_cors_headers(self):
+      """ Sets headers required for CORS """
+      self.send_header("Access-Control-Allow-Origin", "*")
+      self.send_header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+      self.send_header("Access-Control-Allow-Headers", "x-api-key,Content-Type")
+
+    def send_dict_response(self, d):
+        """ Sends a dictionary (JSON) back to the client """
+        self.wfile.write(bytes(dumps(d), "utf8"))
+
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self._send_cors_headers()
+        self.end_headers()
     
     #Handler for the GET requests
     def do_GET(self):
@@ -31,6 +55,11 @@ class myHandler(http.server.BaseHTTPRequestHandler):
             else:
                 self.wfile.write(b'{"required": false}')
             return
+        if self.path=="/status":
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(b'{"isGsm": true, "isInternet": true}')
 
         try:
             #Check the file extension required and
@@ -78,19 +107,60 @@ class myHandler(http.server.BaseHTTPRequestHandler):
            
 
         data = json.loads(self.data_string)
-        print(data['pin'])
-        if (data['pin'] == 1111):
+        pin = data['pin'].strip()
+        if len(pin) != 4:
+            self.send_response(400)
+            self.end_headers()
+            self.wfile.write(b'Pin Code length was not 4!')
+            return
+        try:
+            pin = int(pin)
+        except ValueError:
+            self.send_response(400)
+            self.end_headers()
+            self.wfile.write(b'Pin Code was not a number!')
+            return
+        
+        try:
+            if not huaweiaccess.isPinRequired(huaweiaccess.getHeaders()):
+                self.send_response(400)
+                self.end_headers()
+                self.wfile.write(b'Pin Code Not Required!')
+                return
+            log.debug("Trying pin code {}".format(pin))
+
+            if not huaweiaccess.unlockWithPin(huaweiaccess.getHeaders(), pin):
+                self.send_response(400)
+                self.end_headers()
+                self.wfile.write(b'Unlocking failed...')
+                return
+            if not huaweiaccess.disablePin(huaweiaccess.getHeaders(), pin):
+                self.send_response(400)
+                self.end_headers()
+                self.wfile.write(b'Disableing failed...')
+                return
+
             self.send_response(200)
-        else:
+            self.end_headers()
+            return
+        except KeyboardInterrupt as keyErr:
+            raise keyErr
+        except Exception as err:
+            log.debug("Exception while accessing Huawei LTE Stick", exc_info=True)
             self.send_response(503)
-        self.end_headers()
-        return
+            self.end_headers()
 
 
 with socketserver.TCPServer(("", PORT), myHandler) as httpd:
     print("serving at port", PORT)
     httpd.serve_forever()
 
+def startSmsHandler():
+    while huaweiaccess.isPinRequired():
+        time.sleep(5)
+    smsHandler.runSMSHandler()
+
+threading.Thread(target=startSmsHandler, daemon=True)
 # if __name__ == "__main__":
     # log.debug('Starting SMS Gateway backend application')
 
