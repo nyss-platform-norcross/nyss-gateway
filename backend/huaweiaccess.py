@@ -51,7 +51,6 @@ PIN_OPERATE_ACTION = MODEM_URL + "api/pin/operate"
 PIN_STATUS_ACTION = MODEM_URL + "api/bin/status"
 
 
-
 def isHilink(device_ip):
     try:
         r = requests.get(url=INFORMATION_ACTION, timeout=(2.0,2.0))
@@ -132,28 +131,7 @@ def sendMessage(headers, apiData): #TODO
 def deleteMessage(headers, index):
     r = requests.post(url=DELETE_SMS_ACTION, data=SMS_DEL_TEMPLATE.format(index=index), headers=headers)
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
 
-#     device_ip = '192.168.8.1'
-#     if not isHilink(device_ip):
-#         if not isHilink('hi.link'):
-#             print("Can't find a Huawei HiLink device on the default IP addresses, please try again and pass the device's IP address as a parameter")
-#             print('')
-#             sys.exit(-1)
-#         else:
-#             device_ip = 'hi.link'
-            
-#     # headers = getHeaders(device_ip)
-#     if isPinRequired(device_ip, getHeaders(device_ip)):
-#         print("Pin Required")
-#     else:
-#         print("Sim Unlocked")
-#     # getSMS(device_ip, getHeaders(device_ip))
-#     unlockWithPin(device_ip, getHeaders(device_ip), 1348)
-#     time.sleep(2)
-#     disablePin(device_ip, getHeaders(device_ip), 1348)
-#     if isPinRequired(device_ip, getHeaders(device_ip)):
-#         print("Pin Required")
-#     else:
-#         print("Sim Unlocked")
+    
 
