@@ -8,17 +8,8 @@ import json
 import time
 import datetime
 
-# put 1 for Huawei modem and zero for sim868 zero W modem
-
-whichModemAreYouUsing = 1
-
-if (whichModemAreYouUsing = 1):
-    from huaweiaccess import *
-if (whichModemAreYouUsing = 0):
-    from sim868WaveshareAccess import *
-
-API_URL = "http://ccce053a.ngrok.io/api/SmsGateway/"
-API_KEY = "7d956fc0-4a88-4600-88c1-aae478eca9b8"
+API_URL = "http://7038467e.ngrok.io/api/SmsGateway/"
+API_KEY = "oursupersecretapikey"
 INPUT_MESSAGE_FILE_PATH = "input_messages.txt"
 ERROR_MESSAGE_FILE_PATH = "error_messages.txt"
 
@@ -36,9 +27,6 @@ def sendToAPI(data):
     return requests.post(url = API_URL, json = apiMessage) 
 
 def runSMSHandler():
-
-    if (whichModemAreYouUsing == 1):
-        initializeModem()
 
     open(INPUT_MESSAGE_FILE_PATH, 'w+')
     open(ERROR_MESSAGE_FILE_PATH, 'w+')
