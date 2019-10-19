@@ -26,3 +26,20 @@ done
 
 echo "Stick Found"
 
+echo "Changing Resolve Configuration"
+
+echo "8.8.8.8\n192.168.8.1" >> /etc/resolv.conf
+
+echo "Resolve Config Changed"
+
+echo "Changing metric of wlan0 and eth0 interface..."
+
+sudo ifmetric wlan0 100
+sudo ifmetric eth0 99
+
+echo "Metric Changed...."
+
+echo "Startup finished!"
+
+
+

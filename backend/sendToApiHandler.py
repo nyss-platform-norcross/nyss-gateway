@@ -14,7 +14,7 @@ def runSendToApiHandler():
 
     while (True):
         time.sleep(1)
-        if (len(fileList is not len([name for name in os.listdir('./' + MESSAGES_FOLDER)]))):
+        if (len(fileList) is not len([name for name in os.listdir('./' + MESSAGES_FOLDER)])):
             fileList = [name for name in os.listdir('./' + MESSAGES_FOLDER)]
             getSmsAndPostToPlatform()
 
@@ -24,7 +24,7 @@ def getSmsAndPostToPlatform():
 
 def getLatestSmsDict():
     fileNameLatestSms = sorted([name for name in os.listdir('./' + MESSAGES_FOLDER)])[-1] 
-    with open(fileNameLatestSms, "r") as inputFile:
+    with open('./' + MESSAGES_FOLDER + fileNameLatestSms, "r") as inputFile:
         rawMessage = inputFile.readline()
         return json.loads(rawMessage)
 
