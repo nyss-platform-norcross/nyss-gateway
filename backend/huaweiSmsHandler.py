@@ -35,7 +35,9 @@ MACRO_NET_WORK_TYPE_LTE = '19'  # /*LTE 模式*/
 
 
 INPUT_MESSAGE_POSTFIX = "-input-message.txt"
-MESSAGES_FOLDER = "message-folder/"
+MESSAGES_OUTBOX_FOLDER = "message-folder-outbox/"
+MESSAGES_SENT_FOLDER = "message-folder-sent/"
+MESSAGES_ERRORS_FOLDER = "message-folder-error/"
 
 SMS_LIST_TEMPLATE = '''<request>
     <PageIndex>1</PageIndex>
@@ -94,12 +96,26 @@ def runSMSHandler():
     global index
     index = 0
 
-    if not os.path.exists(MESSAGES_FOLDER):
-        os.makedirs(MESSAGES_FOLDER)
+    if not os.path.exists(MESSAGES_OUTBOX_FOLDER):
+        os.makedirs(MESSAGES_OUTBOX_FOLDER)
+
+    if not os.path.exists(MESSAGES_ERRORS_FOLDER):
+        os.makedirs(MESSAGES_ERRORS_FOLDER)
+
+    if not os.path.exists(MESSAGES_SENT_FOLDER):
+        os.makedirs(MESSAGES_SENT_FOLDER)
     else: 
-        fileList = sorted([name for name in os.listdir('./' + MESSAGES_FOLDER)])
-        if len(fileList) > 0:
-            index = int(fileList[-1][:fileList[-1].index('-')]) + 1
+        fileListSent = sorted([name for name in os.listdir('./' + MESSAGES_SENT_FOLDER)])
+        fileListErrors = sorted([name for name in os.listdir('./' + MESSAGES_ERRORS_FOLDER)])
+       
+        if (len(fileListSent) == 0 and len(fileListErrors) != 0):
+            index = int(fileListErrors[-1][:fileListErrors[-1].index('-')]) + 1
+        elif (len(fileListSent) != 0 and len(fileListErrors) == 0):
+            index = int(fileListSent[-1][:fileListSent[-1].index('-')]) + 1
+        elif (len(fileListSent) > len(fileListErrors)):
+            index = int(fileListSent[-1][:fileListSent[-1].index('-')]) + 1
+        elif (len(fileListSent) < len(fileListErrors)):
+            index = int(fileListERrors[-1][:fileListErrors[-1].index('-')]) + 1
 
     while True:
         time.sleep(1)
@@ -113,7 +129,7 @@ def runSMSHandler():
                 readIndex += 1
                 message = getFirstUnreadMessage()
                 message.update({'msgId' : readIndex})
-                with open(MESSAGES_FOLDER + str(index) + INPUT_MESSAGE_POSTFIX, "w+") as file:
+                with open(MESSAGES_OUTBOX_FOLDER + str(index) + INPUT_MESSAGE_POSTFIX, "w+") as file:
                     file.write(json.dumps(message))
                     index += 1
                 deleteMessage(message['huaweiId'])

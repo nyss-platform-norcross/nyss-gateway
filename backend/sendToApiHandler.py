@@ -6,7 +6,9 @@ import requests
 
 API_URL = "http://7038467e.ngrok.io/api/SmsGateway/"
 API_KEY = "oursupersecretapikey"
-MESSAGES_FOLDER = "message-folder/"
+MESSAGES_OUTBOX_FOLDER = "message-folder-outbox/"
+MESSAGES_SENT_FOLDER = "message-folder-sent/"
+MESSAGES_ERRORS_FOLDER = "message-folder-error/"
 
 def runSendToApiHandler():
 
@@ -14,17 +16,23 @@ def runSendToApiHandler():
 
     while (True):
         time.sleep(1)
-        if (len(fileList) is not len([name for name in os.listdir('./' + MESSAGES_FOLDER)])):
-            fileList = [name for name in os.listdir('./' + MESSAGES_FOLDER)]
+        if (len(fileList) is not len([name for name in os.listdir('./' + MESSAGES_OUTBOX_FOLDER)])):
+            fileList = [name for name in os.listdir('./' + MESSAGES_OUTBOX_FOLDER)]
             getSmsAndPostToPlatform()
 
 def getSmsAndPostToPlatform():
-    smsDict = getLatestSmsDict()
-    postSmsToPlatform(smsDict)
+    if (len([name for name in os.listdir('./' + MESSAGES_OUTBOX_FOLDER)]) > 0):
+        fileNameLatestSms = sorted([name for name in os.listdir('./' + MESSAGES_OUTBOX_FOLDER)])[-1] 
+        smsDict = getSmsDict(fileNameLatestSms)
+        r = postSmsToPlatform(smsDict)
+        if(r.status_code == 200):
+            os.rename('./' + MESSAGES_OUTBOX_FOLDER + fileNameLatestSms, './' + MESSAGES_SENT_FOLDER + fileNameLatestSms)
+        else:
+            os.rename('./' + MESSAGES_OUTBOX_FOLDER + fileNameLatestSms, './' + MESSAGES_ERRORS_FOLDER + fileNameLatestSms + '-' + str(r.status_code))
 
-def getLatestSmsDict():
-    fileNameLatestSms = sorted([name for name in os.listdir('./' + MESSAGES_FOLDER)])[-1] 
-    with open('./' + MESSAGES_FOLDER + fileNameLatestSms, "r") as inputFile:
+
+def getSmsDict(fileNameLatestSms):
+    with open('./' + MESSAGES_OUTBOX_FOLDER + fileNameLatestSms, "r") as inputFile:
         rawMessage = inputFile.readline()
         return json.loads(rawMessage)
 
