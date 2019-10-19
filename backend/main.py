@@ -11,11 +11,15 @@ log = logging.getLogger('WebServer')
 log.setLevel(logging.DEBUG)
 
 def startFronted():
-    while(gsmadapter.isDeviceReady()):
-        time.sleep(1)
+    while not gsmadapter.isDeviceReady():
+        log.debug("Wating for Device...")
+        time.sleep(5)
 
+    log.debug("Checking if pin required")
     if gsmadapter.isPinRequired():
+        log.debug("Pin required!")
         frontend.PinEnterWindow()
+    log.debug("Starting Status Window")
     frontend.StatusWindow()
 
 # def startSmsHandler():
