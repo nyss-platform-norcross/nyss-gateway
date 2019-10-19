@@ -2,12 +2,17 @@
 # -*- coding: utf-8 -*-
 
 import sys, os
-import xmltodict
 import requests
 import json
 import time
 import datetime
+import xmltodict
+import os
 # import sendEmail
+
+INPUT_MESSAGE_POSTFIX = "-input-message.txt"
+ERROR_MESSAGE_POSTFIX = "-error_messages.txt"
+MESSAGES_FOLDER = "message-folder/"
 
 SMS_LIST_TEMPLATE = '''<request>
     <PageIndex>1</PageIndex>
@@ -17,9 +22,7 @@ SMS_LIST_TEMPLATE = '''<request>
     <Ascending>0</Ascending>
     <UnreadPreferred>0</UnreadPreferred>
     </request>'''
-
 SMS_DEL_TEMPLATE = '<request><Index>{index}</Index></request>'
-
 SMS_SEND_TEMPLATE = '''<request>
     <Index>-1</Index>
     <Phones><Phone>{phone}</Phone></Phones>
@@ -29,8 +32,6 @@ SMS_SEND_TEMPLATE = '''<request>
     <Reserved>1</Reserved>
     <Date>{timestamp}</Date>
     </request>'''
-    
-
 PIN_SET_TEMPLATE = '''
 <request>
 <OperateType>{}</OperateType>
@@ -51,6 +52,35 @@ SEND_SMS_ACTION = MODEM_URL + "api/sms/send-sms"
 PIN_OPERATE_ACTION = MODEM_URL + "api/pin/operate"
 PIN_STATUS_ACTION = MODEM_URL + "api/bin/status"
 
+def runSMSHandler():
+    global index
+    index = 0
+    
+    if not os.path.exists(MESSAGES_FOLDER):
+        os.makedirs(MESSAGES_FOLDER)
+    else: 
+        fileList = sorted([name for name in os.listdir('./' + MESSAGES_FOLDER)])
+        index = int(fileList[-1][:fileList[-1].index('-')]) + 1
+
+    while True:
+        time.sleep(1)
+
+        #get input messages and save it to a file in the messages folder. 
+        # It watches out to get the filename of the file with the highest index, retreives the index and adds one to start
+        if getUnreadMessageCount() != 0:
+            readIndex = 0 # is used so the poll message function doesn't block for a long time when a lot of messages arrives but takes breaks after e.g. 40 messages
+            messageLimitPerCall = 40
+            while (getUnreadMessageCount() > 0):
+                readIndex += 1
+                message = getFirstUnreadMessage()
+                message.update({'msgId' : readIndex})
+                with open(MESSAGES_FOLDER + str(index) + INPUT_MESSAGE_POSTFIX, "w+") as file:
+                    file.write(json.dumps(message))
+                    index += 1
+                deleteMessage(message['huaweiId'])
+                time.sleep(0.1)
+                if (readIndex == messageLimitPerCall):
+                    break
 
 def isHilink(device_ip):
     try:
@@ -108,6 +138,7 @@ def disablePin(pin):
 
 def getUnreadMessageCount():
     r = requests.get(url=NOTIFICATION_ACTION, headers=getHeaders())
+    #root = ET.parse(r.text).getroot()
     d = xmltodict.parse(r.text, xml_attribs=True)
     count = int(d['response']['UnreadMessage'])
     return count
@@ -115,16 +146,21 @@ def getUnreadMessageCount():
 def getFirstUnreadMessage():
     r = requests.post(url=SMS_LIST_ACTION, data=SMS_LIST_TEMPLATE, headers=getHeaders())
     d = xmltodict.parse(r.text, xml_attribs=True)
-    count = int(d['response']['Count'])
-    data = d['response']['Messages']['Message']
-    if count == 1:
-        temp = data
-        data = [temp]
-    message = {
-        "index": data[0]['Index'],
-        "content": data[0]['Content'],
-        "phone": data[0]['Phone']
-    }
+    if (d['response']['Messages']['Message']):
+        if (len(d['response']['Messages']['Message']) < 3):
+            return 'Message was misinterpreted'
+        count = int(d['response']['Count'])
+        data = d['response']['Messages']['Message']
+        if count == 1:
+            temp = data
+            data = [temp]
+        message = {
+            "sender": data[0]['Phone'],
+            "timestamp": time.strftime('%Y%m%d%H%M%S', time.strptime(data[0]['Date'], '%Y-%m-%d %H:%M:%S')),
+            "text": data[0]['Content'],
+            "huaweiId": data[0]['Index'],
+            "gatewayId": index
+        }
     return message
 
 def sendMessage(apiData):
@@ -141,3 +177,6 @@ def sendMessage(apiData):
 
 def deleteMessage(index):
     r = requests.post(url=DELETE_SMS_ACTION, data=SMS_DEL_TEMPLATE.format(index=index), headers=getHeaders())
+
+if __name__ == "__main__":
+    runSMSHandler()

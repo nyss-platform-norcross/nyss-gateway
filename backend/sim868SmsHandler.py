@@ -21,6 +21,14 @@ PIN = None # SIM card PIN (if any)
 q = Queue.Queue()
 index = 0
 
+# checks if Pin is required at all
+def isPinRequired(): 
+    pass
+
+# pin wird eingegeben und pin abfrage deaktivierts
+def unlockWithPin(pin): 
+    pass
+
 def handleSms(sms):
     print(u'== SMS message received ==\nFrom: {0}\nTime: {1}\nMessage:\n{2}\n'.format(sms.number, sms.time, sms.text))
     print('Replying to SMS...')

@@ -5,8 +5,8 @@ import cgi
 import json
 import io
 import threading
-import huaweiaccess
-import smsHandler
+import huaweiSmsHandler # TODO: needs to be changed to gsmadapter when jaschas branch is merged
+import sendToApiHandler
 import time
 
 import logging
@@ -50,7 +50,7 @@ class myHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
-            if not huaweiaccess.isPinRequired():
+            if not huaweiSmsHandler.isPinRequired():
                 self.wfile.write(b'{"required": true}')
             else:
                 self.wfile.write(b'{"required": false}')
@@ -122,22 +122,22 @@ class myHandler(http.server.BaseHTTPRequestHandler):
             return
         
         try:
-            if not huaweiaccess.isPinRequired():
+            if not huaweiSmsHandler.isPinRequired():
                 self.send_response(400)
                 self.end_headers()
                 self.wfile.write(b'Pin Code Not Required!')
                 return
             log.debug("Trying pin code {}".format(pin))
 
-            if not huaweiaccess.unlockWithPin(pin):
+            if not huaweiSmsHandler.unlockWithPin(pin):
                 self.send_response(400)
                 self.end_headers()
                 self.wfile.write(b'Unlocking failed...')
                 return
-            if not huaweiaccess.disablePin(pin):
+            if not huaweiSmsHandler.disablePin(pin):
                 self.send_response(400)
                 self.end_headers()
-                self.wfile.write(b'Disableing failed...')
+                self.wfile.write(b'Disabling failed...')
                 return
 
             self.send_response(200)
@@ -160,18 +160,22 @@ def startSmsHandler():
     log.debug("Starting SMS Handler!")
     required = True
     count = 0
-    while huaweiaccess.isPinRequired() or required:
+    while huaweiSmsHandler.isPinRequired() or required:
     # while required:
         time.sleep(1)
         count = count + 1
         if count == 5:
             required = False
     log.debug("Entering SMS Handler loop")
-    smsHandler.runSMSHandler()
+    huaweiSmsHandler.runSMSHandler()
 
+def startSmsToCbsPlatformHandler():
+    log.debug("Starting SMS to CBS platform handler")
+    sendToApiHandler.runSendToApiHandler()
 
 httpServer = threading.Thread(target=startHttpServer, daemon=True)
 smsHandlerThread = threading.Thread(target=startSmsHandler, daemon=True)
+smsToCbsPlatformThread = threading.Thread(target=startSmsToCbsPlatformHandler, daemon=True)
 
 httpServer.start()
 smsHandlerThread.start()
