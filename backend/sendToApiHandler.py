@@ -12,6 +12,15 @@ MESSAGES_ERRORS_FOLDER = "message-folder-error/"
 
 def runSendToApiHandler():
 
+    if not os.path.exists(MESSAGES_OUTBOX_FOLDER):
+    os.makedirs(MESSAGES_OUTBOX_FOLDER)
+
+    if not os.path.exists(MESSAGES_ERRORS_FOLDER):
+        os.makedirs(MESSAGES_ERRORS_FOLDER)
+
+    if not os.path.exists(MESSAGES_SENT_FOLDER):
+        os.makedirs(MESSAGES_SENT_FOLDER)
+
     fileList = []
 
     while (True):
