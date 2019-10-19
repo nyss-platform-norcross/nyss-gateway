@@ -49,7 +49,7 @@ SMS_LIST_ACTION = MODEM_URL + "api/sms/sms-list"
 DELETE_SMS_ACTION = MODEM_URL + "api/sms/delete-sms"
 SEND_SMS_ACTION = MODEM_URL + "api/sms/send-sms"
 PIN_OPERATE_ACTION = MODEM_URL + "api/pin/operate"
-PIN_STATUS_ACTION = MODEM_URL + "api/bin/status"
+PIN_STATUS_ACTION = MODEM_URL + "api/pin/status"
 
 
 def isHilink(device_ip):
@@ -81,30 +81,31 @@ def getHeaders():
         pass
     return headers
     
-def unlockWithPin(pin):
-    r = requests.post(url = PIN_OPERATE_ACTION, data = PIN_SET_TEMPLATE.format(0, pin, '', ''), headers = getHeaders())
-    d = xmltodict.parse(r.text, xml_attribs=True)
-    if d['response'] != "OK":
-        print("Unexpected Response when unlocking with Pin")
-        return False
-    return True
-
-def isPinRequired():
-    return False
-    # r = requests.get(url = PIN_STATUS_ACTION, headers = getHeaders())
-    # d = xmltodict.parse(r.text, xml_attribs=True)
-    # print(d)
-    # if (d['response']['SimState']) == "260":
-    #     return True
-    # else:
-    #     return False
-
 def disablePin(pin):
     r = requests.post(url = PIN_OPERATE_ACTION, data = PIN_SET_TEMPLATE.format(2, pin, '', ''), headers = getHeaders())
     d = xmltodict.parse(r.text, xml_attribs=True)
     if d['response'] != "OK":
         print("Unexpected Response when disableing Pin")
         print(d)
+
+def unlockWithPin(pin):
+    r = requests.post(url = PIN_OPERATE_ACTION, data = PIN_SET_TEMPLATE.format(0, pin, '', ''), headers = getHeaders())
+    d = xmltodict.parse(r.text, xml_attribs=True)
+    if d['response'] != "OK":
+        print("Unexpected Response when unlocking with Pin")
+        return False
+
+    return disablePin(pin)
+
+def isPinRequired():
+    r = requests.get(url = PIN_STATUS_ACTION, headers = getHeaders())
+    d = xmltodict.parse(r.text, xml_attribs=True)
+    print(d)
+    if (d['response']['SimState']) == "260":
+        return True
+    else:
+        return False
+
 
 def getUnreadMessageCount():
     r = requests.get(url=NOTIFICATION_ACTION, headers=getHeaders())
