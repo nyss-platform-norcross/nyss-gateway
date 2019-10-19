@@ -77,18 +77,18 @@ class PinEnterWindow:
             
 
 
-        tkinter.Button(keyboard, text="7", height=2, font=self.baseFont, command = partial(enterPin, 7)).grid(row=0, column = 0, sticky = "wne")
-        tkinter.Button(keyboard, text="8", height=2, font=self.baseFont, command = partial(enterPin, 8)).grid(row=0, column = 1, sticky = "wne")
-        tkinter.Button(keyboard, text="9", height=2, font=self.baseFont, command = partial(enterPin, 9)).grid(row=0, column = 2, sticky = "wne")
-        tkinter.Button(keyboard, text="4", height=2, font=self.baseFont, command = partial(enterPin, 4)).grid(row=1, column = 0, sticky = "wne")
-        tkinter.Button(keyboard, text="5", height=2, font=self.baseFont, command = partial(enterPin, 5)).grid(row=1, column = 1, sticky = "wne")
-        tkinter.Button(keyboard, text="6", height=2, font=self.baseFont, command = partial(enterPin, 6)).grid(row=1, column = 2, sticky = "wne")
-        tkinter.Button(keyboard, text="1", height=2, font=self.baseFont, command = partial(enterPin, 1)).grid(row=2, column = 0, sticky = "wne")
-        tkinter.Button(keyboard, text="2", height=2, font=self.baseFont, command = partial(enterPin, 2)).grid(row=2, column = 1, sticky = "wne")
-        tkinter.Button(keyboard, text="3", height=2, font=self.baseFont, command = partial(enterPin, 3)).grid(row=2, column = 2, sticky = "wne")
-        tkinter.Button(keyboard, text="DEL", height=2, font=self.baseFont, command = delete).grid(row=3, column = 0, sticky = "wne")
-        tkinter.Button(keyboard, text="0", height=2, font=self.baseFont, command = partial(enterPin, 0)).grid(row=3, column = 1, sticky = "wne")
-        tkinter.Button(keyboard, text="OK", height=2, font=self.baseFont, command = submitPin).grid(row=3, column = 2, sticky = "wne")
+        tkinter.Button(keyboard, text="7", height=1, font=self.baseFont, command = partial(enterPin, 7)).grid(row=0, column = 0, sticky = "wne")
+        tkinter.Button(keyboard, text="8", height=1, font=self.baseFont, command = partial(enterPin, 8)).grid(row=0, column = 1, sticky = "wne")
+        tkinter.Button(keyboard, text="9", height=1, font=self.baseFont, command = partial(enterPin, 9)).grid(row=0, column = 2, sticky = "wne")
+        tkinter.Button(keyboard, text="4", height=1, font=self.baseFont, command = partial(enterPin, 4)).grid(row=1, column = 0, sticky = "wne")
+        tkinter.Button(keyboard, text="5", height=1, font=self.baseFont, command = partial(enterPin, 5)).grid(row=1, column = 1, sticky = "wne")
+        tkinter.Button(keyboard, text="6", height=1, font=self.baseFont, command = partial(enterPin, 6)).grid(row=1, column = 2, sticky = "wne")
+        tkinter.Button(keyboard, text="1", height=1, font=self.baseFont, command = partial(enterPin, 1)).grid(row=2, column = 0, sticky = "wne")
+        tkinter.Button(keyboard, text="2", height=1, font=self.baseFont, command = partial(enterPin, 2)).grid(row=2, column = 1, sticky = "wne")
+        tkinter.Button(keyboard, text="3", height=1, font=self.baseFont, command = partial(enterPin, 3)).grid(row=2, column = 2, sticky = "wne")
+        tkinter.Button(keyboard, text="DEL", height=1, font=self.baseFont, command = delete).grid(row=3, column = 0, sticky = "wne")
+        tkinter.Button(keyboard, text="0", height=1, font=self.baseFont, command = partial(enterPin, 0)).grid(row=3, column = 1, sticky = "wne")
+        tkinter.Button(keyboard, text="OK", height=1, font=self.baseFont, command = submitPin).grid(row=3, column = 2, sticky = "wne")
 
 
         self.window.rowconfigure(1, weight=1)
