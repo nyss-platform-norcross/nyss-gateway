@@ -4,7 +4,7 @@ import json
 import requests
 
 
-API_URL = "http://7038467e.ngrok.io/api/SmsGateway/"
+API_URL = "http://19995e31.ngrok.io/api/SmsGateway/"
 API_KEY = "oursupersecretapikey"
 MESSAGES_OUTBOX_FOLDER = "message-folder-outbox/"
 MESSAGES_SENT_FOLDER = "message-folder-sent/"
