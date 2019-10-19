@@ -119,8 +119,17 @@ class StatusWindow:
                 self.window.after(1000, updateIpAddress)
             finally:
                 pass
+        
+        def updateGSMState():
+            try:
+                data = gsmadapter.getState()
+                self.gsmStateTxt.set("Connected: {}\nSignal Strength: {}\nNetwork Type: {}".format(data['serviceAvailable'], data['signalStrength'], data['networkType']))
+                self.window.after(1000, updateGSMState)
+            finally:
+                pass
 
         self.window.after(1000, updateIpAddress)
+        self.window.after(1000, updateGSMState)
         ipLlb = tkinter.Label(self.window, text="IP:").grid(row=0, column=0, sticky="nw")
         tkinter.Label(self.window, textvariable=self.ipTxt).grid(row=0, column=1, sticky="new")
 

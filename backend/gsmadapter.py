@@ -15,6 +15,7 @@ else:
     except Exception:
         print("Enviornment Variable GSM_STICK must be -1,0,1!!!")
 
+GSM_MODULE = HUAWEI_LTE_STICK
 
 if GSM_MODULE is HUAWEI_LTE_STICK:
     import huaweiaccess
@@ -48,3 +49,12 @@ def unlockWithPin(pin):
             return True
         else:
             return False
+
+
+def getState():
+    if GSM_MODULE is HUAWEI_LTE_STICK:
+        return huaweiaccess.getState()
+    elif GSM_MODULE is SIM868_WAVESHARE_GSM:
+        raise RuntimeError("Not Implemented")
+    elif GSM_MODULE is MOCK_STICK:
+        return {}
