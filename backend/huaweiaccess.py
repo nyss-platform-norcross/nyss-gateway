@@ -97,6 +97,9 @@ def disablePin(pin):
     if d['response'] != "OK":
         print("Unexpected Response when disableing Pin")
         print(d)
+        return False
+    else:
+        return True
 
 def unlockWithPin(pin):
     r = requests.post(url = PIN_OPERATE_ACTION, data = PIN_SET_TEMPLATE.format(0, pin, '', ''), headers = getHeaders())
