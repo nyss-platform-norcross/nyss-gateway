@@ -52,6 +52,16 @@ PIN_OPERATE_ACTION = MODEM_URL + "api/pin/operate"
 PIN_STATUS_ACTION = MODEM_URL + "api/pin/status"
 
 
+def isDeviceReady():
+    try:
+        r = requests.get(url=INFORMATION_ACTION, timeout=(2.0,2.0))
+    except requests.exceptions.RequestException as e:
+        return False
+
+    if r.status_code != 200:
+        return False
+    return True
+
 def isHilink(device_ip):
     try:
         r = requests.get(url=INFORMATION_ACTION, timeout=(2.0,2.0))

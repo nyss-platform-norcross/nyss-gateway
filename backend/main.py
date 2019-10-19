@@ -11,6 +11,9 @@ log = logging.getLogger('WebServer')
 log.setLevel(logging.DEBUG)
 
 def startFronted():
+    while(gsmadapter.isDeviceReady()):
+        time.sleep(1)
+
     if gsmadapter.isPinRequired():
         frontend.PinEnterWindow()
     frontend.StatusWindow()
