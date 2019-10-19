@@ -68,7 +68,7 @@ def getHeaders():
     try:
         r = requests.get(url=HEADER_ACTION)
     except requests.exceptions.RequestException as e:
-        return (token, sessionID)
+        raise e
     try:        
         d = xmltodict.parse(r.text, xml_attribs=True)
         if 'response' in d and 'TokInfo' in d['response']:
