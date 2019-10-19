@@ -18,13 +18,13 @@ else:
 GSM_MODULE = HUAWEI_LTE_STICK
 
 if GSM_MODULE is HUAWEI_LTE_STICK:
-    import huaweiaccess
+    import huaweiSmsHandler
 elif GSM_MODULE is SIM868_WAVESHARE_GSM:
-    import sim868WaveshareAccess
+    import sim868SmsHandler
 
 def isDeviceReady():
     if GSM_MODULE is HUAWEI_LTE_STICK:
-        return huaweiaccess.isDeviceReady()
+        return huaweiSmsHandler.isDeviceReady()
     elif GSM_MODULE is SIM868_WAVESHARE_GSM:
         raise RuntimeError("Not Implemented")
     elif GSM_MODULE is MOCK_STICK:
@@ -33,7 +33,7 @@ def isDeviceReady():
 
 def isPinRequired():
     if GSM_MODULE is HUAWEI_LTE_STICK:
-        return huaweiaccess.isPinRequired()
+        return huaweiSmsHandler.isPinRequired()
     elif GSM_MODULE is SIM868_WAVESHARE_GSM:
         raise RuntimeError("Not Implemented")
     elif GSM_MODULE is MOCK_STICK:
@@ -41,7 +41,7 @@ def isPinRequired():
 
 def unlockWithPin(pin):
     if GSM_MODULE is HUAWEI_LTE_STICK:
-        return huaweiaccess.unlockWithPin(pin)
+        return huaweiSmsHandler.unlockWithPin(pin)
     elif GSM_MODULE is SIM868_WAVESHARE_GSM:
         raise RuntimeError("Not Implemented")
     elif GSM_MODULE is MOCK_STICK:
@@ -53,7 +53,7 @@ def unlockWithPin(pin):
 
 def getState():
     if GSM_MODULE is HUAWEI_LTE_STICK:
-        return huaweiaccess.getState()
+        return huaweiSmsHandler.getState()
     elif GSM_MODULE is SIM868_WAVESHARE_GSM:
         raise RuntimeError("Not Implemented")
     elif GSM_MODULE is MOCK_STICK:

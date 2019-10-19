@@ -1,4 +1,6 @@
 import threading
+import huaweiSmsHandler # TODO: needs to be changed to gsmadapter when jaschas branch is merged
+import sendToApiHandler
 import time
 import frontend
 import gsmadapter
@@ -10,6 +12,25 @@ logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s')
 log = logging.getLogger('WebServer')
 log.setLevel(logging.DEBUG)
 
+
+
+
+
+def startSmsHandler():
+    log.debug("Starting SMS Handler!")
+    required = True
+    count = 0
+    log.debug("Entering SMS Handler loop")
+    while gsmadapter.isPinRequired() and not gsmadapter.isDeviceReady():
+        log.debug("SMS Handler waiting...")
+    huaweiSmsHandler.runSMSHandler()
+
+def startSmsToCbsPlatformHandler():
+    log.debug("Starting SMS to CBS platform handler")
+    sendToApiHandler.runSendToApiHandler()
+
+smsHandlerThread = threading.Thread(target=startSmsHandler, daemon=True)
+smsToCbsPlatformThread = threading.Thread(target=startSmsToCbsPlatformHandler, daemon=True)
 def startFronted():
     while not gsmadapter.isDeviceReady():
         log.debug("Wating for Device...")
@@ -22,33 +43,16 @@ def startFronted():
     log.debug("Starting Status Window")
     frontend.StatusWindow()
 
-# def startSmsHandler():
-#     log.debug("Starting SMS Handler!")
-#     required = True
-#     count = 0
-#     while huaweiaccess.isPinRequired() or required:
-#     # while required:
-#         time.sleep(1)
-#         count = count + 1
-#         if count == 5:
-#             required = False
-#     log.debug("Entering SMS Handler loop")
-#     smsHandler.runSMSHandler()
 
-
-# httpServer = threading.Thread(target=startHttpServer, daemon=True)
 frontendThread = threading.Thread(target=startFronted, daemon=True)
-# smsHandlerThread = threading.Thread(target=startSmsHandler, daemon=True)
+smsHandlerThread = threading.Thread(target=startSmsHandler, daemon=True)
 
-# httpServer.start()
 frontendThread.start()
-# smsHandlerThread.start()
-# httpServer.join()
+smsHandlerThread.start()
+smsToCbsPlatformThread.start()
 while True:
     try:
         time.sleep(1.)
     except KeyboardInterrupt as err:
         raise err
 
-# if __name__ == "__main__":
-    # log.debug('Starting SMS Gateway backend application')
