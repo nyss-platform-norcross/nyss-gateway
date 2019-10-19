@@ -13,6 +13,7 @@ log.setLevel(logging.DEBUG)
 def startFronted():
     if gsmadapter.isPinRequired():
         frontend.PinEnterWindow()
+    frontend.StatusWindow()
 
 # def startSmsHandler():
 #     log.debug("Starting SMS Handler!")

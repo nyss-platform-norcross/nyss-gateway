@@ -5,6 +5,10 @@ import time
 import gsmadapter
 
 
+import subprocess
+
+
+
 class PinEnterWindow:
 
    
@@ -92,8 +96,52 @@ class PinEnterWindow:
 
         self.window.mainloop()
 
+
+
+
+class StatusWindow:
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.window = tkinter.Tk()
+        self.window.geometry("640x480")
+        self.ipTxt = tkinter.StringVar(self.window)
+        self.gsmStateTxt = tkinter.StringVar(self.window)
+
+        self.ipTxt.set("Checking...")
+        self.gsmStateTxt.set("Checking...")
+        def updateIpAddress():
+            try:
+                data = subprocess.check_output(['hostname', '--all-ip-addresses'])
+                self.ipTxt.set(data)
+                self.window.after(1000, updateIpAddress)
+            finally:
+                pass
+
+        self.window.after(1000, updateIpAddress)
+        ipLlb = tkinter.Label(self.window, text="IP:").grid(row=0, column=0, sticky="nw")
+        tkinter.Label(self.window, textvariable=self.ipTxt).grid(row=0, column=1, sticky="new")
+
+        tkinter.Label(self.window, text="GSM:").grid(row=1, column=0, sticky="nw")
+        tkinter.Label(self.window, textvariable=self.gsmStateTxt).grid(row=1,column=1, sticky="new")
+
+        self.wifiHelp = tkinter.StringVar(self.window)
+        self.wifiHelp.set("To Setup a WiFi Connection send a SMS with the following content to the Gateway: <SSID>:<Password>")
+
+        tkinter.Label(self.window, textvariable=self.wifiHelp).grid(row=2, column=0, columnspan=2, sticky="new")
+
+
+        
+        self.window.rowconfigure(1, weight=1)
+        self.window.columnconfigure(1, weight=1)
+
+        self.window.mainloop()
+
+
+
 if __name__ == "__main__":
-    window = PinEnterWindow()
+    window = StatusWindow()
 
 
     
