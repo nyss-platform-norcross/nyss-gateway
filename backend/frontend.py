@@ -127,9 +127,9 @@ class StatusWindow:
         tkinter.Label(self.window, textvariable=self.gsmStateTxt).grid(row=1,column=1, sticky="new")
 
         self.wifiHelp = tkinter.StringVar(self.window)
-        self.wifiHelp.set("To Setup a WiFi Connection send a SMS with the following content to the Gateway: <SSID>:<Password>")
+        self.wifiHelp.set("To Setup a WiFi Connection send a SMS with the following content to the Gateway:\n <SSID>:<Password>")
 
-        tkinter.Label(self.window, textvariable=self.wifiHelp).grid(row=2, column=0, columnspan=2, sticky="new")
+        tkinter.Label(self.window, textvariable=self.wifiHelp, wraplength=350).grid(row=2, column=0, columnspan=2, sticky="new")
 
 
         def shutdown():
