@@ -21,7 +21,7 @@ if GSM_MODULE is HUAWEI_LTE_STICK:
 elif GSM_MODULE is SIM868_WAVESHARE_GSM:
     import sim868WaveshareAccess
 
-def deviceReady():
+def isDeviceReady():
     if GSM_MODULE is HUAWEI_LTE_STICK:
         return huaweiaccess.isDeviceReady()
     elif GSM_MODULE is SIM868_WAVESHARE_GSM:
