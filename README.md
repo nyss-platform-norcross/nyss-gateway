@@ -1,1 +1,2 @@
-# nyss-gateway
+# Repository of a custom SMS gateway
+##  
