@@ -14,8 +14,8 @@ class PinEnterWindow:
         self.window = tkinter.Tk()
         self.baseFont = tkinter.font.Font(family="Arial", size=16)
         self.window.title("SMS Gateway")
-        self.window.geometry("600x400")
-        # self.window.attributes("-fullscreen", True)
+        # self.window.geometry("600x400")
+        self.window.attributes("-fullscreen", True)
 
 
         label = tkinter.Label(self.window, text="Pin Code Required")
