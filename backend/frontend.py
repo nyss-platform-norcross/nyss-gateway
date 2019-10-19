@@ -132,6 +132,11 @@ class StatusWindow:
         tkinter.Label(self.window, textvariable=self.wifiHelp).grid(row=2, column=0, columnspan=2, sticky="new")
 
 
+        def shutdown():
+            subprocess.call("sudo shutdown -h now", shell=True)
+
+        tkinter.Button(self.window, text="Shutdown", command = shutdown).grid(row=3, column=0,columnspan=2, sticky="sew")
+
         
         self.window.rowconfigure(1, weight=1)
         self.window.columnconfigure(1, weight=1)
