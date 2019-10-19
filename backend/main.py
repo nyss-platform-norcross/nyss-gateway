@@ -8,6 +8,8 @@ import threading
 import huaweiaccess
 import smsHandler
 import time
+import frontend
+import gsmadapter
 
 import logging
 
@@ -156,6 +158,10 @@ def startHttpServer():
         print("serving at port", PORT)
         httpd.serve_forever()
 
+def startFronted():
+    if gsmadapter.isPinRequired():
+        frontend.PinEnterWindow()
+
 def startSmsHandler():
     log.debug("Starting SMS Handler!")
     required = True
@@ -170,11 +176,13 @@ def startSmsHandler():
     smsHandler.runSMSHandler()
 
 
-httpServer = threading.Thread(target=startHttpServer, daemon=True)
+# httpServer = threading.Thread(target=startHttpServer, daemon=True)
+frontendThread = threading.Thread(target=startFronted, daemon=True)
 smsHandlerThread = threading.Thread(target=startSmsHandler, daemon=True)
 
-httpServer.start()
-smsHandlerThread.start()
+# httpServer.start()
+frontendThread.start()
+# smsHandlerThread.start()
 # httpServer.join()
 while True:
     try:
@@ -184,4 +192,3 @@ while True:
 
 # if __name__ == "__main__":
     # log.debug('Starting SMS Gateway backend application')
-
