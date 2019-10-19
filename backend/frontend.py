@@ -105,7 +105,8 @@ class StatusWindow:
         super().__init__(*args, **kwargs)
 
         self.window = tkinter.Tk()
-        self.window.geometry("640x480")
+        # self.window.geometry("640x480")
+        self.window.attributes("-fullscreen", True)
         self.ipTxt = tkinter.StringVar(self.window)
         self.gsmStateTxt = tkinter.StringVar(self.window)
 
