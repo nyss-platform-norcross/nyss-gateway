@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-import sys, os
+import sys
+import os
 import os
 import requests
 import json
@@ -81,6 +81,7 @@ PIN_STATUS_ACTION = MODEM_URL + "api/pin/status"
 
 index = 0
 
+
 def isDeviceReady():
     try:
         r = requests.get(url=INFORMATION_ACTION, timeout=(2.0, 2.0))
@@ -104,10 +105,12 @@ def runSMSHandler():
 
     if not os.path.exists(MESSAGES_SENT_FOLDER):
         os.makedirs(MESSAGES_SENT_FOLDER)
-    else: 
-        fileListSent = sorted([name for name in os.listdir('./' + MESSAGES_SENT_FOLDER)])
-        fileListErrors = sorted([name for name in os.listdir('./' + MESSAGES_ERRORS_FOLDER)])
-       
+    else:
+        fileListSent = sorted(
+            [name for name in os.listdir('./' + MESSAGES_SENT_FOLDER)])
+        fileListErrors = sorted(
+            [name for name in os.listdir('./' + MESSAGES_ERRORS_FOLDER)])
+
         if (len(fileListSent) == 0 and len(fileListErrors) != 0):
             index = int(fileListErrors[-1][:fileListErrors[-1].index('-')]) + 1
         elif (len(fileListSent) != 0 and len(fileListErrors) == 0):
@@ -120,15 +123,16 @@ def runSMSHandler():
     while True:
         time.sleep(1)
 
-        #get input messages and save it to a file in the messages folder. 
+        # get input messages and save it to a file in the messages folder.
         # It watches out to get the filename of the file with the highest index, retreives the index and adds one to start
         if getUnreadMessageCount() != 0:
-            readIndex = 0 # is used so the poll message function doesn't block for a long time when a lot of messages arrives but takes breaks after e.g. 40 messages
+            readIndex = 0  # is used so the poll message function doesn't block for a long time when a lot of messages arrives but takes breaks after e.g. 40 messages
             messageLimitPerCall = 40
             while (getUnreadMessageCount() > 0):
                 readIndex += 1
                 message = getFirstUnreadMessage()
-                message.update({'msgId' : readIndex})
+                message.update({'msgId': readIndex})
+
                 with open(MESSAGES_OUTBOX_FOLDER + str(index) + INPUT_MESSAGE_POSTFIX, "w+") as file:
                     file.write(json.dumps(message))
                     index += 1
@@ -136,6 +140,7 @@ def runSMSHandler():
                 time.sleep(0.1)
                 if (readIndex == messageLimitPerCall):
                     break
+
 
 def isHilink(device_ip):
     try:
@@ -203,7 +208,6 @@ def isPinRequired():
 
 def getUnreadMessageCount():
     r = requests.get(url=NOTIFICATION_ACTION, headers=getHeaders())
-    #root = ET.parse(r.text).getroot()
     d = xmltodict.parse(r.text, xml_attribs=True)
     count = int(d['response']['UnreadMessage'])
     return count
@@ -214,8 +218,6 @@ def getFirstUnreadMessage():
                       data=SMS_LIST_TEMPLATE, headers=getHeaders())
     d = xmltodict.parse(r.text, xml_attribs=True)
     if (d['response']['Messages']['Message']):
-        if (len(d['response']['Messages']['Message']) < 3):
-            return 'Message was misinterpreted'
         count = int(d['response']['Count'])
         data = d['response']['Messages']['Message']
         if count == 1:
@@ -245,8 +247,8 @@ def sendMessage(apiData):
 
 
 def deleteMessage(index):
-    r = requests.post(url=DELETE_SMS_ACTION, data=SMS_DEL_TEMPLATE.format(index=index), headers=getHeaders())
-
+    r = requests.post(url=DELETE_SMS_ACTION, data=SMS_DEL_TEMPLATE.format(
+        index=index), headers=getHeaders())
 
 
 def getState():
@@ -272,7 +274,7 @@ def getState():
         networkTypeName = "No Service"
     else:
         networkTypeName = "(3G)"
-    
+
     return {
         "signalStrength": signalStrength,
         "serviceAvailable": serviceStatus == 2,
@@ -282,4 +284,3 @@ def getState():
 
 if __name__ == "__main__":
     runSMSHandler()
-

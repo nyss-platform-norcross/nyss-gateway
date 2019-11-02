@@ -1,7 +1,4 @@
-
 import os
-
-
 
 MOCK_STICK = -1
 HUAWEI_LTE_STICK = 0
@@ -22,6 +19,7 @@ if GSM_MODULE is HUAWEI_LTE_STICK:
 elif GSM_MODULE is SIM868_WAVESHARE_GSM:
     import sim868SmsHandler
 
+
 def isDeviceReady():
     if GSM_MODULE is HUAWEI_LTE_STICK:
         return huaweiSmsHandler.isDeviceReady()
@@ -38,6 +36,7 @@ def isPinRequired():
         raise RuntimeError("Not Implemented")
     elif GSM_MODULE is MOCK_STICK:
         return True
+
 
 def unlockWithPin(pin):
     if GSM_MODULE is HUAWEI_LTE_STICK:
