@@ -129,6 +129,7 @@ def runSMSHandler():
                 readIndex += 1
                 message = getFirstUnreadMessage()
                 message.update({'msgId' : readIndex})
+                
                 with open(MESSAGES_OUTBOX_FOLDER + str(index) + INPUT_MESSAGE_POSTFIX, "w+") as file:
                     file.write(json.dumps(message))
                     index += 1
@@ -214,8 +215,8 @@ def getFirstUnreadMessage():
                       data=SMS_LIST_TEMPLATE, headers=getHeaders())
     d = xmltodict.parse(r.text, xml_attribs=True)
     if (d['response']['Messages']['Message']):
-        if (len(d['response']['Messages']['Message']) < 3):
-            return 'Message was misinterpreted'
+        #if (len(d['response']['Messages']['Message']) < 3):
+        #    return 'Message was misinterpreted'
         count = int(d['response']['Count'])
         data = d['response']['Messages']['Message']
         if count == 1:

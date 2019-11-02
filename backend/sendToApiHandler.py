@@ -47,6 +47,8 @@ def getSmsDict(fileNameLatestSms):
 
 
 def postSmsToPlatform(smsDict):
+    print("### Recieved Message")
+    print(smsDict)
     apiMessage = {
         "Sender": smsDict['sender'],
         "TimeStamp": smsDict['timestamp'],
