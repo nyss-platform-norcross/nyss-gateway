@@ -14,5 +14,5 @@ class SMS(Base):
 
 
     def __str__(self):
-        return "[Id: {} - Date Received: {} - Text: {} - Handled: {}]".format(self.id, self.dateReceived, self.text, self.handled)
+        return "[Id: {} - Date Received: {} - Text: {} - Number: {} - Handled: {}]".format(self.id, self.dateReceived, self.text, self.number, self.handled)
 

@@ -1,40 +1,42 @@
-import logging
+
+
 import datetime
-from sqlalchemy.orm import Session, Query
+import logging
+
 from .models import SMS
 
-class SmsPersistentService:
-    
+
+class SmsService:
 
     def __init__(self, logger: logging.Logger, sessionFactory):
         self.log = logger
-        self.sessionFactory = sessionFactory
+        self.session = sessionFactory
 
-
-    def handleNewSMS(self, date: datetime.date, text: str, number: str):
-        self.log.debug('Handleing new SMS. Date: {} - Text: {}'.format(date, text))
-        
+    def saveSMS(self, date: datetime.date, text: str, number: str):
+        self.log.debug(
+            'Handleing new SMS. Date: {} - Text: {}'.format(date, text))
         smsObj = SMS()
         smsObj.dateReceived = date
         smsObj.text = text
-        session: Session = self.sessionFactory()
+        smsObj.number = number
+        session: Session = self.session()
         session.add(smsObj)
         session.commit()
         session.close()
 
-    def getAllUnhandledSMS(self) -> [SMS]:
-        session: Session = self.sessionFactory()
+    def getAllUnhandledSMS(self):
+        session: Session = self.session()
         smss = session.query(SMS).filter(SMS.handled == False).all()
         session.close()
 
         return smss
 
     def markSMSHandled(self, sms: SMS):
-        assert sms.handled == False
-        session: Session = self.sessionFactory()
+        if sms.handled == True:
+            self.log.warn('SMS already marked handled!!!{}'.format(sms))
+        session: Session = self.session()
         sms.handled = True
         sms.dateHandled = datetime.datetime.now()
         session.add(sms)
         session.commit()
         session.close()
-        

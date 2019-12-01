@@ -11,7 +11,7 @@ def createDatabase(engine):
     alembic_cfg = Config("alembic.ini")
     command.stamp(alembic_cfg, "head")
 
-def main(save_service, publisher):
+def main(save_service):
     print("Main started...")
     sleep(10)
     for sms in save_service.getAllUnhandledSMS():

@@ -2,13 +2,12 @@ from dependency_injector import containers, providers
 
 import logging
 import sqlite3
-from smshandling.smsPersistentService import SmsPersistentService
-from smshandling.smsPublisherService import SmsPublisherService
+from smshandling.smsService import SmsService
 from publishing.services import ApiPublisher
 import main
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
-from gsm.services import DummySMSReader, HuaweiReader
+from gsm.services import create_reader
 from sqlalchemy.pool import StaticPool
 
 
@@ -34,44 +33,32 @@ class IocContainer(containers.DeclarativeContainer):
         session_maker
     )
 
+    sms_service = providers.Factory(
+        SmsService,
+        logger=logger,
+        sessionFactory=session_factory
+    )
+
+    sms_reader = providers.Singleton(
+        create_reader,
+        reader_type=config.gsm.handler,
+        smsService=sms_service,
+        logger=logger
+    )
+
     api_publisher = providers.Factory(
         ApiPublisher,
         API_URL=config.api.url,
         API_ID=config.api.id,
         API_KEY=config.api.key,
         logger=logger,
+        smsService=sms_service,
     )
-
-    save_service = providers.Factory(
-        SmsPersistentService,
-        logger=logger,
-        sessionFactory=session_factory
-    )
-
-
-    if config.gsm.handler == 'HUAWEI':
-        sms_reader = providers.Singleton(
-            HuaweiReader,
-            smsHandler=save_service,
-            logger=logger,
-        )
-    elif config.gsm.handler == 'DUMMY':
-        sms_reader = providers.Singleton(
-            DummySMSReader,
-            smsHandler=save_service
-        )
-
-    sms_publisher = providers.Singleton(
-        SmsPublisherService,
-        logger=logger,
-        smsPersistentService=save_service,
-        publisher=api_publisher)
 
     createDatabase = providers.Callable(
         main.createDatabase, engine=database_engine)
 
     main = providers.Callable(
         main.main,
-        save_service=save_service,
-        publisher=sms_publisher,
+        save_service=sms_service,
     )

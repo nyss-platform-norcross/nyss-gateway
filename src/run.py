@@ -2,6 +2,8 @@ from iocContainer import IocContainer
 import logging
 import sys
 import os
+from dependency_injector import providers
+from gsm.huaweireader import HuaweiReader
 
 DATABASE_FILE_NAME = 'smsstore.db'
 
@@ -19,7 +21,7 @@ CONFIGURATION = {
         'url': 'localhost',
     },
     'gsm': {
-        'handler': GSM_HANDLER_HUAWEI,
+        'handler': GSM_HANDLER_DUMMY,
     }
 }
 
@@ -35,4 +37,5 @@ if __name__ == "__main__":
     if needToCreateDatabase:
         container.createDatabase()
     container.sms_reader()
+    container.api_publisher()
     container.main(*sys.argv[1:])
