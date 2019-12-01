@@ -5,9 +5,10 @@ import datetime
 import uuid
 import time
 
-
-class HuaweiReader:
+from .services import GSMAdapter, GSMStatus
+class HuaweiAdapter(GSMAdapter):
     def __init__(self, smsService: SmsService, logger, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.smsService = smsService
         self.log: logging.Logger = logger
 

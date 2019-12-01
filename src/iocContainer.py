@@ -7,7 +7,7 @@ from publishing.services import ApiPublisher
 import main
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
-from gsm.services import create_reader
+from gsm import create_gsmadapter
 from sqlalchemy.pool import StaticPool
 
 
@@ -39,8 +39,8 @@ class IocContainer(containers.DeclarativeContainer):
         sessionFactory=session_factory
     )
 
-    sms_reader = providers.Singleton(
-        create_reader,
+    gsm_adapter = providers.Singleton(
+        create_gsmadapter,
         reader_type=config.gsm.handler,
         smsService=sms_service,
         logger=logger

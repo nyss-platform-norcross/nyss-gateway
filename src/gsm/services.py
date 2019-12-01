@@ -3,11 +3,35 @@ import time
 import datetime
 import uuid
 
-from .huaweireader import HuaweiReader
+class GSMStatus:
+    def __init__(self, signalStrength, providerName):
+        self.signalStrength = signalStrength
+        self.providerName = providerName
 
-class DummySMSReader:
+class GSMAdapter:
+    def __init__(self):
+        super().__init__()
+    
+    def addSMSHandler(self, callback):
+        raise NotImplementedError('This is a Metaclass')
+
+    def isUnlocked(self) -> bool:
+        raise NotImplementedError()
+
+    def unlockWithPin(self, pin: str) -> bool:
+        raise NotImplementedError()
+
+    def sendSMS(self, callback):
+        raise NotImplementedError()
+
+    def getStatus(self):
+        raise NotImplementedError()
+
+
+class DummyAdapter(GSMAdapter):
 
     def __init__(self, smsService, *args, **kwargs):
+        super().__init__()
         self.smsService = smsService
         self.dummyThread = threading.Thread(name="Dummy SMS Reader", target=self._run, daemon=True)
         self.start()
@@ -23,8 +47,3 @@ class DummySMSReader:
     
 
 
-def create_reader(reader_type: str, *args, **kwargs):
-    if reader_type == 'DUMMY':
-        return DummySMSReader(*args, **kwargs)
-    elif reader_type == 'HUAWEI':
-        return HuaweiReader(**kwargs)

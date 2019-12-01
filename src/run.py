@@ -3,7 +3,6 @@ import logging
 import sys
 import os
 from dependency_injector import providers
-from gsm.huaweireader import HuaweiReader
 
 DATABASE_FILE_NAME = 'smsstore.db'
 
@@ -21,7 +20,7 @@ CONFIGURATION = {
         'url': 'localhost',
     },
     'gsm': {
-        'handler': GSM_HANDLER_DUMMY,
+        'handler': GSM_HANDLER_HUAWEI,
     }
 }
 
@@ -36,6 +35,6 @@ if __name__ == "__main__":
     container.logger().addHandler(logging.StreamHandler(sys.stdout))
     if needToCreateDatabase:
         container.createDatabase()
-    container.sms_reader()
+    container.gsm_adapter()
     container.api_publisher()
     container.main(*sys.argv[1:])
