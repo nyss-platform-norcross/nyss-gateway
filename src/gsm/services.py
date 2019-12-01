@@ -34,12 +34,18 @@ class DummyAdapter(GSMAdapter):
         super().__init__()
         self.smsService = smsService
         self.dummyThread = threading.Thread(name="Dummy SMS Reader", target=self._run, daemon=True)
-        self.start()
-
-
-    def start(self):
         self.dummyThread.start()
 
+
+    def isUnlocked(self):
+        return True
+
+    def unlockWithPin(self, pin):
+        return True
+
+    def sendSMS(self, callback):
+        callback()
+    
     def _run(self):
         while True:
             self.smsService.saveSMS(datetime.datetime.now(), str(uuid.uuid4()), "DUMMY-0-000-000")
