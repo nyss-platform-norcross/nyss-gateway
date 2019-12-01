@@ -19,7 +19,7 @@ CONFIGURATION = {
         'url': 'localhost',
     },
     'gsm': {
-        'handler': GSM_HANDLER_DUMMY,
+        'handler': GSM_HANDLER_HUAWEI,
     }
 }
 

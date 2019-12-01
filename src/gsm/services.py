@@ -3,6 +3,7 @@ import time
 import datetime
 import uuid
 
+from .huaweireader import HuaweiReader
 
 class DummySMSReader:
 

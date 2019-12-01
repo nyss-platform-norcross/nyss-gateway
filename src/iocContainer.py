@@ -8,7 +8,7 @@ from publishing.services import ApiPublisher
 import main
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
-from gsm.services import DummySMSReader
+from gsm.services import DummySMSReader, HuaweiReader
 from sqlalchemy.pool import StaticPool
 
 
@@ -48,15 +48,12 @@ class IocContainer(containers.DeclarativeContainer):
         sessionFactory=session_factory
     )
 
-    sms_reader = providers.Singleton(
-        DummySMSReader,
-        smsHandler=save_service
-    )
 
     if config.gsm.handler == 'HUAWEI':
         sms_reader = providers.Singleton(
-            DummySMSReader,
-            smsHandler=save_service
+            HuaweiReader,
+            smsHandler=save_service,
+            logger=logger,
         )
     elif config.gsm.handler == 'DUMMY':
         sms_reader = providers.Singleton(
