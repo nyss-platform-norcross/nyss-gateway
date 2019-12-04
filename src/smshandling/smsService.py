@@ -12,7 +12,7 @@ class SmsService:
         self.log = logger
         self.session = sessionFactory
 
-    def saveSMS(self, date: datetime.date, text: str, number: str):
+    def saveSMS(self, date: datetime.datetime, text: str, number: str):
         self.log.debug(
             'Handleing new SMS. Date: {} - Text: {}'.format(date, text))
         smsObj = SMS()

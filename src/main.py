@@ -13,7 +13,9 @@ def createDatabase(engine):
 
 def main(save_service):
     print("Main started...")
-    sleep(10)
-    for sms in save_service.getAllUnhandledSMS():
-        print("Unhandeld SMS: {}".format(sms))
+    while True:
+        sleep(1.)
+    # sleep(10)
+    # for sms in save_service.getAllUnhandledSMS():
+    #     print("Unhandeld SMS: {}".format(sms))
     # publisher._trypublishUnhandledSMS()
