@@ -17,16 +17,12 @@ _SMS_LISTERNS = []
 def SmsListener(func):
 
     
-    print(func)
     global _SMS_LISTERNS
     if (_isClassMethod.search(func.__qualname__)):
-        print('Registering Class method')
         return MemberDecoratorClass(_SMS_LISTERNS, func)
     else:
         _SMS_LISTERNS.append(func)
         return func
-    # return func
-    # return func
 
 
 def create_gsmadapter(reader_type: str, *args, **kwargs) -> GSMAdapter:
