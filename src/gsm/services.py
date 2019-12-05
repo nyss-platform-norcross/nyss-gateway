@@ -3,26 +3,25 @@ import time
 import datetime
 import uuid
 
-class GSMStatus:
-    def __init__(self, signalStrength, providerName, available):
-        self.signalStrength = signalStrength
-        self.available = available
-        self.providerName = providerName
+from .model import GSMStatus, RawSMS
+
+
 
 class GSMAdapter:
-    def __init__(self):
-        super().__init__()
-    
+    def __init__(self, *args, **kwargs):
+        self._smsHandler = {}
+
     def addSMSHandler(self, callback) -> str:
         '''
-            callback signature: (phoneNumber: str, text: str, timestamp: datetime.datetime)
+            callback signature: (rawSMS: RawSMS)
             return : handlerId: str
                     Use this to unregister a sms handler
         '''
-        raise NotImplementedError('This is a Metaclass')
+        handlerId = uuid.uuid4().hex
+        self._smsHandler[handlerId] = callback
 
-    def removeSMSHandler(self, id: str):
-        raise NotImplementedError()
+    def removeSMSHandler(self, handlerId: str):
+        del self._smsHandler[handlerId]
 
     def isUnlocked(self) -> bool:
         raise NotImplementedError()
@@ -39,25 +38,30 @@ class GSMAdapter:
 
 class DummyAdapter(GSMAdapter):
 
-    def __init__(self, smsService, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__()
-        self.smsService = smsService
         self.dummyThread = threading.Thread(name="Dummy SMS Reader", target=self._run, daemon=True)
         self.dummyThread.start()
 
-
-    def isUnlocked(self):
+    def isUnlocked(self) -> bool:
         return True
 
-    def unlockWithPin(self, pin):
-        return True
+    def unlockWithPin(self, pin: str):
+        pass
 
-    def sendSMS(self, callback):
+    def sendSMS(self, number: str, text: str, callback):
+        time.sleep(0.5)
         callback()
+
+    def getStatus(self):
+        return GSMStatus('1', 'DUMMY-Provider', True)
+
     
     def _run(self):
         while True:
-            self.smsService.saveSMS(datetime.datetime.now(), str(uuid.uuid4()), "DUMMY-0-000-000")
+            sms = RawSMS("DUMMY-0-000-000", datetime.datetime.now(), str(uuid.uuid4()))
+            for handler in self._smsHandler.keys():
+                func = self._smsHandler[handler](sms)
             time.sleep(1.)
     
 

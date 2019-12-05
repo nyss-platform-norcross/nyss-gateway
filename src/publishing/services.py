@@ -20,11 +20,8 @@ class ApiPublisher:
         self.publisherThread.start()
 
     def publish(self, id: int, date: datetime.datetime, text: str):
-        if random.randint(0, 1) > 0:
-            self.log.debug(
-                'Publishing SMS top API: ID:{} Date:{} Text:{}'.format(id, date, text))
-        else:
-            raise IOError('Failed to connect tu API')
+        self.log.debug(
+            'Publishing SMS top API: ID:{} Date:{} Text:{}'.format(id, date, text))
 
     def _publishLoop(self):
         while True:

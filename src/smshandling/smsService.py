@@ -4,13 +4,18 @@ import datetime
 import logging
 
 from .models import SMS
+from gsm import RawSMS, SmsListener
+from common import Component
 
-
-class SmsService:
+class SmsService(metaclass=Component):
 
     def __init__(self, logger: logging.Logger, sessionFactory):
         self.log = logger
         self.session = sessionFactory
+
+    @SmsListener
+    def _smsListener(self, rawSms: RawSMS):
+        self.saveSMS(date=rawSms.date, text=rawSms.text, number=rawSms.phone)
 
     def saveSMS(self, date: datetime.datetime, text: str, number: str):
         self.log.debug(

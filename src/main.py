@@ -2,6 +2,7 @@ import datetime
 from smshandling.models import SMS
 from base import Base
 from time import sleep
+from gsm import SmsListener
 
 def createDatabase(engine):
     print('creating database tables')
@@ -10,6 +11,7 @@ def createDatabase(engine):
     from alembic import command
     alembic_cfg = Config("alembic.ini")
     command.stamp(alembic_cfg, "head")
+
 
 def main(save_service):
     print("Main started...")

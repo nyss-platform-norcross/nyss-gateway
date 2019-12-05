@@ -6,8 +6,8 @@ import time
 import xmltodict
 import requests
 
-from gsm.services import GSMAdapter, GSMStatus
-from smshandling.smsService import SmsService
+from .services import GSMAdapter
+from .model import RawSMS, GSMStatus
 
 MACRO_NET_WORK_TYPE_NOSERVICE = '0'          # /* 无服务            */
 MACRO_NET_WORK_TYPE_GSM = '1'          # /* GSM模式           */
@@ -103,25 +103,24 @@ class HuaweiSMS:
 
 
 class HuaweiAdapter(GSMAdapter):
-    def __init__(self, logger, smsService: SmsService, *args, **kwargs):
+    def __init__(self, logger, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.log: logging.Logger = logger
 
         self.log.debug('Creating Huawei Reader')
         self.dummyThread = threading.Thread(
             name="Huawei SMS Reader", target=self._run, daemon=True)
-        self._smsHandler = {}
-        def saveHandler(number, content, date):
-            smsService.saveSMS(date, content, number)
-        self.addSMSHandler(saveHandler)
+
         self._start()
 
     def _start(self):
         self.dummyThread.start()
 
     def _run(self):
-        while self._isPinRequired():
+        while True:
             try:
+                if self._isPinRequired() is False:
+                    break
                 self.log.debug('Waiting for pin unlock...')
             except:
                 self.log.debug('Waiting for device availability')
@@ -155,13 +154,6 @@ class HuaweiAdapter(GSMAdapter):
             finally:
                 time.sleep(5.)
 
-    def addSMSHandler(self, callback) -> str:
-        handlerId = uuid.uuid4().hex
-        self._smsHandler[handlerId] = callback
-
-    def removeSMSHandler(self, handlerId):
-        del self._smsHandler[handlerId]
-
     def isUnlocked(self) -> bool:
         return self._isPinRequired()
 
@@ -183,10 +175,12 @@ class HuaweiAdapter(GSMAdapter):
 
     def _publishSMS(self, message: HuaweiSMS):
         successful = True
+        rawSms = RawSMS(message.Phone, datetime.datetime.strptime(
+            message.Date, '%Y-%m-%d %H:%M:%S'),  message.Content)
         for handler in self._smsHandler.keys():
             try:
                 self._smsHandler[handler](
-                    message.Phone, message.Content, datetime.datetime.strptime(message.Date, '%Y-%m-%d %H:%M:%S'))
+                    rawSms)
             except:
                 self.log.error(
                     'Exception in SMSHandler. Will not delete SMS and try again later', exc_info=True)
@@ -210,7 +204,7 @@ class HuaweiAdapter(GSMAdapter):
         token = None
         sessionID = None
         try:
-            r = requests.get(url=HEADER_ACTION)
+            r = requests.get(url=HEADER_ACTION, timeout=2.0)
         except requests.exceptions.RequestException as e:
             raise e
         try:
