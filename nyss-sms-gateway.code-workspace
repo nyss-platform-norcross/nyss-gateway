@@ -6,9 +6,6 @@
 		{
 			"path": "src"
 		},
-		{
-			"path": "backend"
-		}
 	],
 	"settings": {}
 }
