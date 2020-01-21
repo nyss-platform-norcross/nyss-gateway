@@ -1,10 +1,9 @@
 import threading
-import time 
+import time
 import datetime
 import uuid
 
 from .model import GSMStatus, RawSMS
-
 
 
 class GSMAdapter:
@@ -40,7 +39,8 @@ class DummyAdapter(GSMAdapter):
 
     def __init__(self, *args, **kwargs):
         super().__init__()
-        self.dummyThread = threading.Thread(name="Dummy SMS Reader", target=self._run, daemon=True)
+        self.dummyThread = threading.Thread(
+            name="Dummy SMS Reader", target=self._run, daemon=True)
         self.dummyThread.start()
 
     def isUnlocked(self) -> bool:
@@ -56,13 +56,11 @@ class DummyAdapter(GSMAdapter):
     def getStatus(self):
         return GSMStatus('1', 'DUMMY-Provider', True)
 
-    
     def _run(self):
         while True:
-            sms = RawSMS("DUMMY-0-000-000", datetime.datetime.now(), str(uuid.uuid4()))
+            # text = str(uuid.uuid4())
+            text = "1#1#1"
+            sms = RawSMS("+0000000", datetime.datetime.utcnow(), text=text)
             for handler in self._smsHandler.keys():
                 func = self._smsHandler[handler](sms)
-            time.sleep(1.)
-    
-
-
+            time.sleep(10.)

@@ -15,12 +15,13 @@ CONFIGURATION = {
         'url': 'sqlite:///{}'.format(DATABASE_FILE_NAME),
     },
     'api': {
-        'key': '409g43',
-        'id': 'grwog230',
-        'url': 'localhost',
+        'key': '<YOUR REGISTERED API KEY>',
+        'id': '1',
+        'url': '<THE API URL>',
     },
     'gsm': {
         'handler': GSM_HANDLER_HUAWEI,
+        # 'handler': GSM_HANDLER_DUMMY,
     }
 }
 

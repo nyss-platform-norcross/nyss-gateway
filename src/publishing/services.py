@@ -2,7 +2,9 @@ import datetime
 import logging
 import random
 import threading
+import requests
 from time import sleep
+import json
 
 from smshandling.models import SMS
 from smshandling.smsService import SmsService
@@ -18,10 +20,29 @@ class ApiPublisher:
         self.publisherThread = threading.Thread(
             name="API Publisher Thread", daemon=True, target=self._publishLoop)
         self.publisherThread.start()
+        self._api_url = API_URL
+        self._api_key = API_KEY
+        self._api_id = API_ID
 
-    def publish(self, id: int, date: datetime.datetime, text: str):
+    def publish(self, id: int, date: datetime.datetime, text: str, number: str):
         self.log.debug(
             'Publishing SMS top API: ID:{} Date:{} Text:{}'.format(id, date, text))
+        url = self._api_url
+        params = {
+            'sender': number,
+            'timestamp': date.strftime("%Y%m%d%H%M%S"),
+            'text': text,
+            'msgid': id,
+            'modemno': self._api_id,
+            'modemno': 1,
+            'apikey': self._api_key
+        }
+        res: requests.Response = requests.post(
+            url=url,
+            data=params
+        )
+        if not res.ok:
+            raise IOError('Failed to post to api. HTTPStatuscode: {}'.format(res.status_code))
 
     def _publishLoop(self):
         while True:
@@ -35,7 +56,7 @@ class ApiPublisher:
             sms: SMS
             self.log.debug('Trying to publish SMS to API: {}'.format(sms))
             try:
-                self.publish(sms.id, sms.dateReceived, sms.text)
+                self.publish(sms.id, sms.dateReceived, sms.text, sms.number)
                 self.smsService.markSMSHandled(sms)
             except:
                 self.log.warn('Failed to publish SMS...', exc_info=True)

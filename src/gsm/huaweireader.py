@@ -175,8 +175,11 @@ class HuaweiAdapter(GSMAdapter):
 
     def _publishSMS(self, message: HuaweiSMS):
         successful = True
-        rawSms = RawSMS(message.Phone, datetime.datetime.strptime(
-            message.Date, '%Y-%m-%d %H:%M:%S'),  message.Content)
+        rawSms = RawSMS(message.Phone,
+                        #  datetime.datetime.strptime(message.Date, '%Y-%m-%d %H:%M:%S'),
+                        # TODO This currently uses the local utc timestamp!! dangerous
+                        datetime.datetime.utcnow(),
+                        message.Content)
         for handler in self._smsHandler.keys():
             try:
                 self._smsHandler[handler](
@@ -253,7 +256,9 @@ class HuaweiAdapter(GSMAdapter):
             if count == 1:
                 temp = data
                 data = [temp]
-            message = HuaweiSMS(Phone=data[0]['Phone'], Date=data[0]['Date'],
+
+            message = HuaweiSMS(Phone=data[0]['Phone'],
+                                Date=data[0]['Date'],
                                 Content=data[0]['Content'], Index=data[0]['Index'])
             # datetime.datetime.strptime(data[0]['Date'], '%Y-%m-%d %H:%M:%S')
         return message
