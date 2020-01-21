@@ -1,2 +1,4 @@
 __pycache__/
 smsstore.db
+.vs
+.vscode/settings.json
