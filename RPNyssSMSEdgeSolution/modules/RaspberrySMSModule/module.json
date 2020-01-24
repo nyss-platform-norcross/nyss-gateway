@@ -12,7 +12,7 @@
         "arm32v7.debug": "./Dockerfile.arm32v7.debug"
       }
     },
-    "buildOptions": [],
+    "buildOptions": ["-f"],
     "contextPath": "./"
   },
   "language": "python"

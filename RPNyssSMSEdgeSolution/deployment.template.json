@@ -63,9 +63,20 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.RaspberrySMSModule}",
+              "image": "${MODULES.RaspberrySMSModule.arm32v7}",
               "createOptions": {
-                "Network": "host"
+                "HostConfig": {
+                  "NetworkMode": "host",
+                  "Mounts": [
+                    {
+                      "Target": "/etc/wpa_supplicant",
+                      "Source": "/etc/wpa_supplicant",
+                      "Type": "bind",
+                      "ReadOnly": false,
+                      "Consistency": "default"
+                    }
+                  ]
+                }
               }
             }
           }
