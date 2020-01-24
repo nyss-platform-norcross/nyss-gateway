@@ -14,6 +14,7 @@ import os
 
 def initialize(config):
     logger = logging.getLogger("NYSS-Gateway")
+    logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler(sys.stdout))
 
     database_engine = create_engine(config['database']['url'], connect_args={

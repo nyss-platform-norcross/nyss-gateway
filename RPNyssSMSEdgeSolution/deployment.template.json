@@ -58,18 +58,23 @@
         },
         "modules": {
           "RaspberrySMSModule": {
-            "version": "1.0",
+            "version": "0.0.1",
             "type": "docker",
             "status": "running",
             "restartPolicy": "always",
             "settings": {
               "image": "${MODULES.RaspberrySMSModule.arm32v7}",
               "createOptions": {
-                "Env": {
-                  "DATABASE": "/data/smsstore.db",
-                  "NYSS_API_KEY": "test",
-                  "NYSS_API_ID": "1",
-                  "NYSS_API_URL": "http://google.com"
+                "Env": [
+                  "DATABASE=/data/smsstore.db",
+                  "NYSS_API_KEY=test",
+                  "NYSS_API_ID=1",
+                  "NYSS_API_URL=http://google.com"
+                ],
+                "NetworkingConfig": {
+                  "EndpointsConfig": {
+                    "host": {}
+                  }
                 },
                 "HostConfig": {
                   "NetworkMode": "host",

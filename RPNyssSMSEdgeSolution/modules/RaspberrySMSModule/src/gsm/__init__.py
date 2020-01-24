@@ -1,7 +1,7 @@
 
 from .huaweireader import HuaweiAdapter
 from .services import DummyAdapter, GSMAdapter
-from .model import RawSMS
+from .model import RawSMS, GSMStatus
 
 from common import MemberDecoratorClass
 
