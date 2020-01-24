@@ -21,5 +21,8 @@ def getInterfaceStatus():
             status.append(_parseIpStatus(iface))
     print(status)
 
+from wifihandler import addNewWifiSettings
+
 if __name__ == "__main__":
-    getInterfaceStatus()
+    addNewWifiSettings("DasHier", "allesgrossgeschrieben")
+    # getInterfaceStatus()

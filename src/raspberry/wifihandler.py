@@ -30,12 +30,12 @@ def addNewWifiSettings(ssid: str, password: str):
     _log.debug("Wifi Settings added")
 
 
-@SmsListener
-def handleWifiSMS(sms: RawSMS):
-    if sms.text.startswith('WIFI:'):
-        parts = sms.text.split(':')
-        ssid = parts[1]
-        password = parts[2]
-        addNewWifiSettings(ssid, password)
-    else:
-        return
+# @SmsListener
+# def handleWifiSMS(sms: RawSMS):
+#     if sms.text.startswith('WIFI:'):
+#         parts = sms.text.split(':')
+#         ssid = parts[1]
+#         password = parts[2]
+#         addNewWifiSettings(ssid, password)
+#     else:
+#         return
