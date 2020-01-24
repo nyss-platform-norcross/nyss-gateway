@@ -1,10 +1,9 @@
-from iocContainer import IocContainer
 import logging
 import sys
 import os
-from dependency_injector import providers
+from iocContainer import initialize
 
-DATABASE_FILE_NAME = '/data/smsstore.db'
+DATABASE_FILE_NAME = os.getenv('DATABASE', 'smsstore.db')
 
 GSM_HANDLER_DUMMY = 'DUMMY'
 GSM_HANDLER_HUAWEI = 'HUAWEI'
@@ -13,11 +12,12 @@ CONFIGURATION = {
     'database': {
         # 'url': 'sqlite://',
         'url': 'sqlite:///{}'.format(DATABASE_FILE_NAME),
+        'file': DATABASE_FILE_NAME
     },
     'api': {
-        'key': '<YOUR REGISTERED API KEY>',
-        'id': '1',
-        'url': '<THE API URL>',
+        'key': os.getenv('NYSS_API_KEY', 'dummykey'),
+        'id': os.getenv('NYSS_API_ID', '1'),
+        'url': os.getenv('NYSS_API_URL', 'http://localhost'),
     },
     'gsm': {
         'handler': GSM_HANDLER_HUAWEI,
@@ -26,16 +26,4 @@ CONFIGURATION = {
 }
 
 if __name__ == "__main__":
-    needToCreateDatabase = False
-    if os.path.exists(DATABASE_FILE_NAME) is False:
-        needToCreateDatabase = True
-
-    container = IocContainer(
-        config=CONFIGURATION
-    )
-    container.logger().addHandler(logging.StreamHandler(sys.stdout))
-    if needToCreateDatabase:
-        container.createDatabase()
-    container.gsm_adapter()
-    container.api_publisher()
-    container.main(*sys.argv[1:])
+    initialize(CONFIGURATION)

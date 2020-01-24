@@ -1,4 +1,3 @@
-from dependency_injector import containers, providers
 
 import logging
 import sqlite3
@@ -9,56 +8,37 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from gsm import create_gsmadapter
 from sqlalchemy.pool import StaticPool
+import sys
+import os
 
 
-class IocContainer(containers.DeclarativeContainer):
+def initialize(config):
+    logger = logging.getLogger("NYSS-Gateway")
+    logger.addHandler(logging.StreamHandler(sys.stdout))
 
-    config = providers.Configuration('config')
-    logger = providers.Singleton(logging.Logger, name='NYSS-Gateway')
+    database_engine = create_engine(config['database']['url'], connect_args={
+                                    'check_same_thread': False})
 
-    database_engine = providers.Singleton(
-        create_engine,
-        config.database.url,
-        connect_args={'check_same_thread': False},
-        # poolclass=StaticPool,
-    )
+    needToCreateDatabase = False
+    if os.path.exists(config['database']['file']) is False:
+        needToCreateDatabase = True
+    if needToCreateDatabase:
+        main.createDatabase(engine=database_engine)
 
-    session_maker = providers.Singleton(
-        sessionmaker,
-        bind=database_engine
-    )
+    session_maker = sessionmaker(bind=database_engine)
 
-    session_factory = providers.Singleton(
-        scoped_session,
-        session_maker
-    )
+    session_factory = scoped_session(session_maker)
 
-    sms_service = providers.Factory(
-        SmsService,
-        logger=logger,
-        sessionFactory=session_factory
-    )
+    sms_service = SmsService(logger=logger, sessionFactory=session_factory)
 
-    gsm_adapter = providers.Singleton(
-        create_gsmadapter,
-        reader_type=config.gsm.handler,
-        smsService=sms_service,
-        logger=logger
-    )
+    gsm_adapter = create_gsmadapter(
+        reader_type=config['gsm']['handler'], smsService=sms_service, logger=logger)
 
-    api_publisher = providers.Factory(
-        ApiPublisher,
-        API_URL=config.api.url,
-        API_ID=config.api.id,
-        API_KEY=config.api.key,
-        logger=logger,
-        smsService=sms_service,
-    )
+    api_publisher = ApiPublisher(API_URL=config['api']['url'],
+                                 API_ID=config['api']['id'],
+                                 API_KEY=config['api']['key'],
+                                 logger=logger,
+                                 smsService=sms_service)
 
-    createDatabase = providers.Callable(
-        main.createDatabase, engine=database_engine)
+    main.main(sms_service)
 
-    main = providers.Callable(
-        main.main,
-        save_service=sms_service,
-    )

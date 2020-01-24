@@ -65,8 +65,15 @@
             "settings": {
               "image": "${MODULES.RaspberrySMSModule.arm32v7}",
               "createOptions": {
+                "Env": {
+                  "DATABASE": "/data/smsstore.db",
+                  "NYSS_API_KEY": "test",
+                  "NYSS_API_ID": "1",
+                  "NYSS_API_URL": "http://google.com"
+                },
                 "HostConfig": {
                   "NetworkMode": "host",
+                  "Privileged": true,
                   "Mounts": [
                     {
                       "Target": "/wpa_supplicant",
@@ -74,7 +81,8 @@
                       "Type": "bind",
                       "ReadOnly": false,
                       "Consistency": "default"
-                    },{
+                    },
+                    {
                       "Target": "/data",
                       "Source": "/opt/containerdata",
                       "Type": "bind",
