@@ -63,13 +63,14 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.RaspberrySMSModule.arm32v7}",
+              "image": "${MODULES.RaspberrySMSModule}",
               "createOptions": {
                 "Env": [
                   "DATABASE=/data/smsstore.db",
                   "NYSS_API_KEY=test",
                   "NYSS_API_ID=1",
-                  "NYSS_API_URL=http://google.com"
+                  "NYSS_API_URL=http://google.com",
+                  "DISPLAY=$DISPLAY"
                 ],
                 "NetworkingConfig": {
                   "EndpointsConfig": {
