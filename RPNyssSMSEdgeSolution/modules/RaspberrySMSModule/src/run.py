@@ -4,7 +4,7 @@ import sys
 import os
 from dependency_injector import providers
 
-DATABASE_FILE_NAME = 'smsstore.db'
+DATABASE_FILE_NAME = '/data/smsstore.db'
 
 GSM_HANDLER_DUMMY = 'DUMMY'
 GSM_HANDLER_HUAWEI = 'HUAWEI'

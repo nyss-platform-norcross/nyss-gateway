@@ -10,7 +10,7 @@ def _write_to_wpa_suuplicant(ssid: str, password: str):
     wifiConfig = '\nnetwork={{\n    ssid="{}"\n    psk="{}"\n}}\n'.format(
         ssid, password)
 
-    with open("/etc/wpa_supplicant/wpa_supplicant.conf", 'a+') as wpa:
+    with open("/wpa_supplicant/wpa_supplicant.conf", 'a+') as wpa:
         wpa.write(wifiConfig)
     subprocess.run(["wpa_cli", "-i", "wlan0", "reconfigure"])
 

@@ -69,8 +69,14 @@
                   "NetworkMode": "host",
                   "Mounts": [
                     {
-                      "Target": "/etc/wpa_supplicant",
+                      "Target": "/wpa_supplicant",
                       "Source": "/etc/wpa_supplicant",
+                      "Type": "bind",
+                      "ReadOnly": false,
+                      "Consistency": "default"
+                    },{
+                      "Target": "/data",
+                      "Source": "/opt/containerdata",
                       "Type": "bind",
                       "ReadOnly": false,
                       "Consistency": "default"
