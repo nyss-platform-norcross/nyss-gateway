@@ -4,6 +4,10 @@ import time
 import logging
 
 # Python 3 needs to be installed on the SMSEagle to start this script, using "do-not-use_apt-get"
+# do-not-use_apt-get update
+# do-not-use_apt-get install python3
+# do-not-use_apt-get install python3-pip
+# pip3 install azure-iot-device
 
 #The connection string can be found in azure iot hub 
 conn_str = ""
