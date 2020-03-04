@@ -10,7 +10,10 @@ import logging
 # pip3 install azure-iot-device
 
 #The connection string can be found in azure iot hub 
-conn_str = ""
+conn_str = "
+login = ""
+cred = ""
+
 logging.basicConfig(
     filename='/var/log/iot-bridge-log.log',
     format='%(asctime)s %(levelname)-8s %(message)s',
@@ -18,6 +21,8 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S')
 
 def send_sms(params):
+    params["login"] = login
+    params["pass"] = cred   
     return str(requests.get('https://localhost/index.php/http_api/send_sms', params=params, verify=False))
 
 if __name__ == "__main__":
