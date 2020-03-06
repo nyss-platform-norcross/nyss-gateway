@@ -9,7 +9,13 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "env": {
+                "IOT_HUB_CONNECTIONSTRING": "",
+                "SMSEAGLE_USERNAME": "",
+                "SMSEAGLE_PWD": ""
+            },
+            "args": []
         },
         {
             "name": "Python: Remote Attach",
