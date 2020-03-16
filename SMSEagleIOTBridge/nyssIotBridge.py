@@ -19,7 +19,7 @@ def _execute_command(method, payload):
 def device_method_listener(device_client, methods_to_listen_for):
     while True:
         method_request = device_client.receive_method_request()
-        logger.info("Incoming direct method '{}'\nPayload: {}".format(method_request.name, str(method_request.payload)))
+        logger.debug("Incoming direct method '{}'\nPayload: {}".format(method_request.name, str(method_request.payload)))
 
         if method_request.name in methods_to_listen_for:
             status, data = _execute_command(methods_to_listen_for[method_request.name], method_request.payload)
@@ -37,10 +37,10 @@ def device_method_listener(device_client, methods_to_listen_for):
 
 def init(connection_string, methods):
     if connection_string is "":
-        logger.error("Missing connection string!")
+        print("Missing connection string!")
         return 0
 
-    logger.info("Starting listenining for direct methods of type [{}]...".format(', '.join(methods.keys())))
+    print("Starting listening for direct methods of type [{}]...".format(', '.join(methods.keys())))
 
     client = IoTHubDeviceClient.create_from_connection_string(connection_string, websockets=True)
     # connect the client.

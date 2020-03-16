@@ -12,21 +12,31 @@ import sys
 # do-not-use_apt-get install python3-pip
 # pip3 install azure-iot-device
 
-
-def get_sys_arg(i):
-    sys.argv[i] if i < len(sys.argv) else None
-
-
-# The connection string can be found in azure iot hub
-IOT_HUB_CONNECTIONSTRING = get_sys_arg(1) or os.environ["IOT_HUB_CONNECTIONSTRING"]
-SMSEAGLE_USERNAME = get_sys_arg(2) or os.environ["SMSEAGLE_USERNAME"]
-SMSEAGLE_PWD = get_sys_arg(3) or os.environ["SMSEAGLE_PWD"]
-
 logging.basicConfig(
     filename='/var/log/iot-bridge-log.log',
     format='%(asctime)s %(levelname)-8s %(message)s',
     level=logging.DEBUG,
     datefmt='%Y-%m-%d %H:%M:%S')
+
+logger = logging.getLogger("iot-hub-bridge")
+
+
+def get_sys_arg(i):
+    return sys.argv[i] if i < len(sys.argv) else None
+
+
+def get_env_var(key):
+    try:
+        return os.environ[key]
+    except Exception as e:
+        logger.error("Environment variable " + key + " not found!")
+        raise
+
+
+# The connection string can be found in azure iot hub
+IOT_HUB_CONNECTIONSTRING = get_sys_arg(1) or get_env_var("IOT_HUB_CONNECTIONSTRING")
+SMSEAGLE_USERNAME = get_sys_arg(2) or get_env_var("SMSEAGLE_USERNAME")
+SMSEAGLE_PWD = get_sys_arg(3) or get_env_var("SMSEAGLE_PWD")
 
 
 def send_sms(params):
