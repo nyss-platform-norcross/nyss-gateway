@@ -15,7 +15,7 @@ import sys
 logging.basicConfig(
     filename='/var/log/iot-bridge-log.log',
     format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.DEBUG,
+    level=logging.WARNING,
     datefmt='%Y-%m-%d %H:%M:%S')
 
 logger = logging.getLogger("iot-hub-bridge")

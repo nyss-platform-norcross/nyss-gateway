@@ -50,17 +50,3 @@ def init(connection_string, methods):
     device_method_thread = threading.Thread(target=device_method_listener, args=(client, methods))
     device_method_thread.daemon = True
     device_method_thread.start()
-
-
-if __name__ == "__main__":
-    logging.basicConfig()
-    if conn_str is "":
-        print("You need to fill in the connection string at the top of the file.")
-    #init(lambda x: print(x), conn_str)
-    # Wait for user to indicate they are done listening for messages
-    while True:
-        selection = input("Press Q to quit\n")
-        if selection == "Q" or selection == "q":
-            print("Quitting...")
-            break
-    _device_client.disconnect()
