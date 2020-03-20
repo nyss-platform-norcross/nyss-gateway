@@ -7,11 +7,21 @@
 * Add a user at the far top right
 * Use whatever name and password combination you want, but it needs to match whatever you set in the environment variables in 1.2.5
 * The level should be user
-* Access to API MUST be turned on
-* Its best to turn it to custom and check send_sms :)
+* Access to API MUST should be turned to custom and access to send_sms
+* If the custom access is to difficult you can also set it to on :)
 ### 1.2.2. Install python3 and dependencies on SMSEagle
+
+You only have to do 1.2.2.1 or 1.2.2.2. If you have managed to install it with 1.2.2.1 you can jump directly to 1.2.3.!
+
 #### 1.2.2.1. The easy way :)
-* Python 3 needs to be installed on the SMSEagle to start this script, using "do-not-use_apt-get"
+
+The following commands have to be run from a shell on the SMSEagle. So first find the IP of the SMSEagle and then use:
+```
+ssh root@IPofEagle
+```
+
+and then install Python3 from there.
+
 * do-not-use_apt-get update
 * do-not-use_apt-get install python3
 * do-not-use_apt-get install python3-pip
@@ -91,7 +101,8 @@ You need the following files:
 * https://github.com/nyss-platform-norcross/nyss-sms-gateway/blob/sms-eagle-iot-connection/SMSEagleIOTBridge/nyssIotBridge.py 
 * https://github.com/nyss-platform-norcross/nyss-sms-gateway/blob/sms-eagle-iot-connection/SMSEagleIOTBridge/smsEagle-iot-hub-handler.py
 
-If the repository does not exist anymore for some reason, you can probably find the files on one of the existing SMSEagles in the folder /home/pi.
+If the repository does not exist anymore for some reason, you can probably find the files on one of the existing SMSEagles in the folder /home/pi. 
+After you have downloaded them, make sure that the filename is exactly that, and e.g. windows did not "accidentally" add .txt as an extension.
 
 Copy the following files to the SMSEagles /home/pi folder:
 ```
@@ -167,7 +178,9 @@ After the service is configured as in the previous chapter, the following file s
 ```
 /etc/systemd/system/nyss-iot-bridge.service
 ```
-The environment variables are configured using a so called Drop-In file. Create the following folder:
+The environment variables are configured using a so called Drop-In file. Create the following folder. The following describes how to create and fill it directly on the SMSEagle. You can also create it on your host computer and copy it over using the scp commands described earlier.
+
+As for the method to create it directly on the SMSEagle:
 ```
 mkdir /etc/systemd/system/nyss-iot-bridge.service.d
 ```
@@ -183,8 +196,8 @@ Environment="SMSEAGLE_USERNAME=usernameyoucreatedbefore"
 Environment="SMSEAGLE_PWD=pwdyoucreatedbefore"
 ```
 
-You can get the IOT_HUB_CONNECTIONSTRING variable from the Azure IOT Hub. 
-
+You can get the IOT_HUB_CONNECTIONSTRING variable from the Azure IOT Hub (Primary Connection String). The creation of the Eagle in Azure IOT Hub is described in the respective Readme file coming with the Nyss codebase. If that is not available, refer to the Microsoft tutorials on how to create an IOT device. 
+The IOT_HUB_CONNECTIONSTRING is what is refered to as the Primary Connection String in Azure IOT Hub.
 
 ### 1.2.6. Start service & Wrap up
 
