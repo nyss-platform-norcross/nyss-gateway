@@ -1,4 +1,42 @@
 # 1. Preparations before deployment
+## 1.1. Add UTC as an option on the SMSEage
+The SMSEagle does not have an option to set its time to UTC. Its possible to set it to a country which has UTC without a switch to sumertime, e.g. Africa/Dakar is a possibility. 
+
+To make it a bit nicer in the SMSEagles frontend, we can add UTC as an option to choose, which will always request GMT0 from the timeserver.
+
+1. Open a shell on the SMSEagle
+```
+ssh root@ipOfEagle
+```
+2. Add the option in the datetime_helper.php script:
+```
+vi /mnt/ramdisk/www/application/helpers/timezone_helper.php
+```
+Add the following option to the top of the timezone array:
+```
+'UTC' => 'GMT0',
+```
+So we end up with:
+```
+function getTimeInformation($filter = '') {
+        
+        $timezone = array(
+            'UTC' => 'GMT0',
+            'Africa/Abidjan' => 'GMT0',
+            'Africa/Accra' => 'GMT0',
+            ...
+```
+The used shortkeys for vi are:
+"o" - create new line and enter mode to type in stuff
+"escape" - exit from interactive (type in) mode
+":w" - save file
+":q" - exit file
+3. Do the same in the following file  (otherwise the option will not be available after a reboot)
+```
+vi /var/www/application/helpers/timezone_helper.php
+```
+4. Go to the SMSEagles web interface, Settings -> Date/Time and set it to the UTC option you created before.
+
 ## 1.2. Setup of Azure IOT-Hub connection 
 ### 1.2.1. Create user for python script
 * Find the IP of your SMSEagle
