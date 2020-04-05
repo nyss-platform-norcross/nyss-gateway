@@ -7,7 +7,7 @@ $color-accent:  rgb(252, 63, 174);
 
 $font-size-default: 14px;
 $font-size-large: 20px;
-$font-size-small: 9px;
+$font-size-x-small: 7px;
 
 QWidget#main {
   background-color: $bg-root-color;
@@ -57,6 +57,6 @@ QPushButton#test {
 
 QLabel#footer {
   background-color: none;
-  font-size: $font-size-small;
+  font-size: $font-size-x-small;
 
 }
