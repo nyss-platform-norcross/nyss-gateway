@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAc
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import pyqtSlot, QTimer, QDirIterator
 from PyQt5.QtCore import Qt
-import PyQt5.QtQuick
 import functools
 
 from gsm import GSMStatus
@@ -53,6 +52,7 @@ class SimTab(QWidget):
         dlg.setLayout(layout)
 
         lineEdit = QLineEdit()
+        lineEdit.setReadOnly(True)
         layout.addWidget(lineEdit, stretch=1)
 
         numberWidget = QWidget()

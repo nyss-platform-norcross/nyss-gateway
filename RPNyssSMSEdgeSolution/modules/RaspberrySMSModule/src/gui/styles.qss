@@ -94,6 +94,7 @@ QDialog {
 QLineEdit {
   color: $font-color;
   font-size: $font-size-large;
+  border: none;
 }
 
 QPushButton#number {
