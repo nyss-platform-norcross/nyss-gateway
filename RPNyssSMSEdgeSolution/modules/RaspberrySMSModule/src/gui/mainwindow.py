@@ -1,33 +1,66 @@
-import PyQt5.QtCore as Qt
-import PyQt5.QtWidgets as qtWidgets
 import sys
-
-class MainWindow(qtWidgets.QMainWindow):
-    def __init__(self, *args, **kwargs):
-        super(MainWindow, self).__init__(*args, **kwargs)
-
-        self.setWindowTitle("My Awesome App")
-        self.resize(480, 320)
-
-        self.widget = qtWidgets.QWidget()
-        self.mainlayout = qtWidgets.QHBoxLayout()
-        self.widget.setLayout(self.mainlayout)
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import pyqtSlot
+from .status_tab import StatusTab
 
 
-        label = qtWidgets.QLabel("This is a PyQt5 window!")
-        self.mainlayout.addItem(label)
-        # The `Qt` namespace has a lot of attributes to customise
-        # widgets. See: http://doc.qt.io/qt-5/qt.html
+class MainWidget(QWidget):
 
-        # Set the central widget of the Window. Widget will expand
-        # to take up all the space in the window by default.
-        self.setCentralWidget(self.widget)
+    def __init__(self, parent):
+        super(QWidget, self).__init__(parent)
+        self.layout = QVBoxLayout()
+        self.setObjectName("main")
+        # Initialize tab screen
+        self.tabs = QTabWidget()
+        self.status = StatusTab()
+        self.umts = QWidget()
+        # self.tabs.resize(300, 200)
+
+        # Add tabs
+        self.tabs.addTab(self.status, "Status")
+        self.tabs.addTab(self.umts, "SIM")
+
+        # Add tabs to widget
+        self.layout.addWidget(self.tabs)
+        self.setLayout(self.layout)
+
+    @pyqtSlot()
+    def on_click(self):
+        print("\n")
+        for currentQTableWidgetItem in self.tableWidget.selectedItems():
+            print(currentQTableWidgetItem.row(),
+                  currentQTableWidgetItem.column(), currentQTableWidgetItem.text())
 
 
-if __name__ == "__main__":
-    app = qtWidgets.QApplication(sys.argv)
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.title = 'PyQt5 tabs - pythonspot.com'
+        self.left = 0
+        self.top = 0
+        self.width = 480
+        self.height = 320
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+
+        self.table_widget = MainWidget(self)
+        self.setCentralWidget(self.table_widget)
+        self.setObjectName("main")
+
+        self.show()
+
+
+def runGui():
+    app = QApplication(sys.argv)
+
+    with open("styles.qss", 'r') as hd:
+        styles = hd.read()
+        app.setStyleSheet(styles)
 
     window = MainWindow()
-    window.show()
 
     app.exec_()
+
+if __name__ == "__main__":
+    runGui()

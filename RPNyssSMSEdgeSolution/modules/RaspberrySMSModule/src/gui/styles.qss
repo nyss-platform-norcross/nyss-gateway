@@ -1,0 +1,39 @@
+
+QWidget#main {
+  background-color: #1b1b1b;
+}
+
+QWidget {
+  background-color: #303030;
+}
+
+QTabWidget::tab-bar {
+  alignment: center;
+  padding: 0px;
+}
+
+QTabWidget::pane {
+  background-color: #303030;
+}
+
+QTabBar::tab {
+  width: 230px;
+  height: 60px;
+  background-color: #303030;
+  color: rgb(238, 238, 238);
+  font-weight: bold;
+  font-size: 20px;;
+  border-bottom: 3px solid rgb(201, 31, 31);
+  
+}
+
+
+QTabBar::tab::selected {
+  width: 230px;
+  height: 60px;
+  background-color: #686868;
+}
+
+QPushButton#test {
+  color: red;
+}
