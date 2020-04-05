@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAc
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot
 from .status_tab import StatusTab
+import re
 
 
 class MainWidget(QWidget):
@@ -50,17 +51,37 @@ class MainWindow(QMainWindow):
 
         self.show()
 
+def loadStylesSheet() -> str:
+    with open("gui/styles.qss", 'r') as hd:
+        lines = hd.readlines()
+
+        styleWithoutVariables = []
+
+        variables = []
+        for line in lines:
+            groups = re.findall(r'^(\$[a-zA-Z-]+):\s+(.*);$', line)
+            if (len(groups) == 1) and len(groups[0]) == 2:
+                variables.append((groups[0][0].replace('$', '\$'), groups[0][1]))
+            else:
+                styleWithoutVariables.append(line)
+
+        finalLines = []
+        for line in styleWithoutVariables:
+            for variable in variables:
+                line = re.sub(variable[0], variable[1], line)
+            finalLines.append(line)
+    return "\n".join(finalLines)
+
 
 def runGui():
     app = QApplication(sys.argv)
 
-    with open("styles.qss", 'r') as hd:
-        styles = hd.read()
-        app.setStyleSheet(styles)
+    app.setStyleSheet(loadStylesSheet())
 
     window = MainWindow()
 
     app.exec_()
+
 
 if __name__ == "__main__":
     runGui()
