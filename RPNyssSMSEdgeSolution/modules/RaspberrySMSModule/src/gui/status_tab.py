@@ -7,6 +7,7 @@ import datetime
 import time
 import math
 import random
+from .sms_receiving_status import SmsReceivingChart
 
 
 def timestamp():
@@ -27,6 +28,7 @@ class StatusTab(QWidget):
     def __init__(self):
         super(QWidget, self).__init__()
 
+
         self.layout = QGridLayout(self)
         self._create_net_info()
         self._create_received_chart()
@@ -39,41 +41,12 @@ class StatusTab(QWidget):
         
 
     def _create_received_chart(self):
-        self.sms_received_chart = pg.PlotWidget(self, axisItems={'bottom': TimeAxisItem(orientation='bottom')})
+        self.sms_received_chart = SmsReceivingChart()
         self.layout.addWidget(self.sms_received_chart, 1, 0)
 
-        self.x = np.arange(24)
-        self.y = np.linspace(0, 100, 24)
-
-        # bars = pg.BarGraphItem(x=np.arange(24), height=np.zeros((24)), width=0.4)
-
-        # self.sms_received_chart.addItem(bars)
-        a = 0
-
-        plottedItems = []
-
-        def updater():
-            nonlocal a
-            a += 1
-            smsSuccess = random.randint(10, 100)
-            smsError = random.randint(0, 2)
-
-            x = timestamp()
-            x0 = x - 0.4
-            x1 = x + 0.4
-            success = pg.BarGraphItem(x0=[x0], x1=[x], height=[smsSuccess], brush="g")
-            errors =  pg.BarGraphItem(x0=[x], x1=[x1], height=[smsError], brush="r")
-            self.sms_received_chart.addItem(errors)
-            self.sms_received_chart.addItem(success)
-            plottedItems.append((success, errors))
-            if (len(plottedItems) > 24):
-                items = plottedItems.pop(0)
-                self.sms_received_chart.removeItem(items[0])
-                self.sms_received_chart.removeItem(items[1])
-
-        for i in range(24):
-            updater()
         timer = QTimer(self)
+        def updater():
+            self.sms_received_chart.update(random.randint(5, 40), random.randint(0, 5))
         timer.timeout.connect(updater)
         timer.start(1000)
 

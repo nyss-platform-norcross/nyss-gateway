@@ -7,6 +7,7 @@ $color-accent:  rgb(252, 63, 174);
 
 $font-size-default: 14px;
 $font-size-large: 20px;
+$font-size-small: 9px;
 
 QWidget#main {
   background-color: $bg-root-color;
@@ -32,25 +33,30 @@ QTabWidget::pane {
 
 QTabBar::tab {
   width: 230px;
-  height: 60px;
+  height: 40px;
   background-color: $bg-color;
   color: $font-color;
   font-weight: bold;
   font-size: $font-size-large;
-  border-bottom: 3px solid  $bg-root-color;
+  border-bottom: 2px solid  $bg-root-color;
   
 }
 
 
 QTabBar::tab::selected {
   width: 230px;
-  height: 60px;
   background-color: #686868;
   color: $color-primary;
-  border-bottom: 3px solid  $color-primary;
+  border-bottom: 2px solid  $color-primary;
 }
 
 
 QPushButton#test {
   color: red;
+}
+
+QLabel#footer {
+  background-color: none;
+  font-size: $font-size-small;
+
 }

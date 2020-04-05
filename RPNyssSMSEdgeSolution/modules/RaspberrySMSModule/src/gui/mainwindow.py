@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout, QLabel
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot
 from .status_tab import StatusTab
@@ -16,6 +16,9 @@ class MainWidget(QWidget):
         self.tabs = QTabWidget()
         self.status = StatusTab()
         self.umts = QWidget()
+
+        self.footer_label = QLabel("NYSS-Redcross SMS-Gateway. Version: 0.0.1-SNAPSHOT")
+        self.footer_label.setObjectName("footer")
         # self.tabs.resize(300, 200)
 
         # Add tabs
@@ -24,6 +27,7 @@ class MainWidget(QWidget):
 
         # Add tabs to widget
         self.layout.addWidget(self.tabs)
+        self.layout.addWidget(self.footer_label)
         self.setLayout(self.layout)
 
     @pyqtSlot()
@@ -44,7 +48,6 @@ class MainWindow(QMainWindow):
         self.height = 320
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
-
         self.table_widget = MainWidget(self)
         self.setCentralWidget(self.table_widget)
         self.setObjectName("main")
