@@ -41,5 +41,5 @@ def initialize(config):
                                  logger=logger,
                                  smsService=sms_service)
 
-    main.main(sms_service)
+    main.main(gsm_adapter, sms_service)
 

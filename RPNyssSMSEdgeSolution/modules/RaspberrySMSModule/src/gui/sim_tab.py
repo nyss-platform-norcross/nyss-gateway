@@ -3,12 +3,13 @@ from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import pyqtSlot, QTimer, QDirIterator
 from PyQt5.QtCore import Qt
 import functools
+from .view_controller import ViewController
 
 from gsm import GSMStatus
 
 
 class SimTab(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, view_controller: ViewController, parent=None):
         super().__init__(parent=parent)
         self.layout = QGridLayout(self)
 
@@ -18,6 +19,8 @@ class SimTab(QWidget):
 
         self._create_sim_unlock()
 
+        view_controller.gsmstatus.connect(self.gsm_status)
+        self.view_controller = view_controller
 
     def _createGSMStatus(self):
         gsmStatusWidget = QWidget(self)
@@ -37,11 +40,22 @@ class SimTab(QWidget):
         layout.addRow(QLabel("Provider"), self._provider_name_label)
         layout.addRow(QLabel("Signal Strength"), self._signal_strength_label)
 
+    @pyqtSlot(GSMStatus)
+    def gsm_status(self, status: GSMStatus):
+        self._available_label.setText(status.available)
+        self._provider_name_label.setText(status.providerName)
+        self._signal_strength_label.setText(status.signalStrength)
+        if status.available == 'Pin Required':
+            self._unlock_button.setEnabled(True)
+        else:
+            self._unlock_button.setEnabled(False)
+
     def _create_sim_unlock(self):
         self._unlock_button = QPushButton(self)
         self._unlock_button.setText("Enter SIM Pin")
         self._unlock_button.setObjectName("primary")
         self._unlock_button.clicked.connect(self._on_sim_unlock)
+        self._unlock_button.setEnabled(False)
         self.layout.addWidget(self._unlock_button)
 
     def _on_sim_unlock(self):
@@ -102,7 +116,14 @@ class SimTab(QWidget):
         ok_button.setText("Accept")
         actions.addWidget(ok_button)
 
-        ok_button.clicked.connect(dlg.close)
-        cancel_button.clicked.connect(dlg.close)
+        def ok_click():
+            self.view_controller.submit_pin(lineEdit.text())
+            dlg.close()
+
+        def cancel_click():
+            dlg.close()
+
+        ok_button.clicked.connect(ok_click)
+        cancel_button.clicked.connect(cancel_click)
 
         dlg.exec_()

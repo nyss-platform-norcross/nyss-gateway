@@ -46,7 +46,7 @@ class ApiPublisher:
 
     def _publishLoop(self):
         while True:
-            self._trypublishUnhandledSMS()
+            # self._trypublishUnhandledSMS()
             sleep(1.0)
 
     def _trypublishUnhandledSMS(self):

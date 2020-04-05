@@ -36,3 +36,5 @@ def create_gsmadapter(reader_type: str, *args, **kwargs) -> GSMAdapter:
 
     for listener in _SMS_LISTERNS:
         adapter.addSMSHandler(listener)
+    
+    return adapter

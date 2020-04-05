@@ -91,6 +91,7 @@ SEND_SMS_ACTION = MODEM_URL + "api/sms/send-sms"
 PIN_OPERATE_ACTION = MODEM_URL + "api/pin/operate"
 PIN_STATUS_ACTION = MODEM_URL + "api/pin/status"
 SET_SMS_READ_ACTION = MODEM_URL + "api/sms/set-read"
+GET_PROVIDER_NAME = MODEM_URL + "api/net/current-plmn"
 
 
 class HuaweiSMS:
@@ -112,6 +113,10 @@ class HuaweiAdapter(GSMAdapter):
             name="Huawei SMS Reader", target=self._run, daemon=True)
 
         self._start()
+        
+        self._stick_found = False
+        self._no_sim_card = True
+        self._pin_required = True
 
     def _start(self):
         self.dummyThread.start()
@@ -119,9 +124,16 @@ class HuaweiAdapter(GSMAdapter):
     def _run(self):
         while True:
             try:
-                if self._isPinRequired() is False:
-                    break
-                self.log.debug('Waiting for pin unlock...')
+                if self._isSimCardInserted() is False:
+                    self.log.debug('No Sim Card')
+                    self._no_sim_card = True
+                else:
+                    self._no_sim_card = False
+                if self._no_sim_card == False:
+                    if self._isPinRequired() is False:
+                        self._pin_required = False
+                        break
+                    self.log.debug('Waiting for pin unlock...')
             except:
                 self.log.debug('Waiting for device availability')
             finally:
@@ -129,6 +141,7 @@ class HuaweiAdapter(GSMAdapter):
         while True:
             try:
                 status = self.getStatus()
+                self._stick_found = True
                 if status.available == False:
                     time.sleep(5)
                     self.log.debug('Waiting for network availability')
@@ -146,9 +159,11 @@ class HuaweiAdapter(GSMAdapter):
                         self._handlePublishedSMS(message)
 
             except requests.ConnectionError:
+                self._stick_found = False
                 self.log.debug(
                     'Request Connection error... Stick is unreacheable')
             except:
+                self._stick_found = False
                 self.log.error(
                     "Unhandled Error in Huawei SMS reader loop!", exc_info=True)
             finally:
@@ -165,13 +180,49 @@ class HuaweiAdapter(GSMAdapter):
         callback()
 
     def getStatus(self) -> GSMStatus:
-        huaweiState = self._getState()
-        status = GSMStatus(
-            signalStrength=huaweiState['signalStrength'],
-            available=huaweiState['serviceAvailable'],
-            providerName='Not Implemented',
-        )
-        return status
+
+        try:
+            if self._no_sim_card == True:
+                status = GSMStatus(
+                    signalStrength="Unavailable",
+                    available="No sim card",
+                    providerName="Unavailable"
+                )
+                return status
+            if self._pin_required == True:
+                status = GSMStatus(
+                    signalStrength="Unavailable",
+                    available="Pin Required",
+                    providerName="Unavailable"
+                )
+                return status
+            huaweiState = self._getState()
+            if huaweiState['serviceAvailable']:
+                available = "Yes"
+            else:
+                available = "No"
+
+            status = GSMStatus(
+                signalStrength="{}".format(huaweiState['signalStrength']),
+                available=available,
+                providerName=huaweiState['providerName'],
+            )
+            return status
+        except requests.ConnectionError:
+            if self._no_sim_card:
+                status = GSMStatus(
+                    signalStrength="Unavailable",
+                    available="Stick not found",
+                    providerName="Unavailable"
+                )
+                return status
+            else:
+                status = GSMStatus(
+                    signalStrength="Unavailable",
+                    available="Stick not found",
+                    providerName="Unavailable"
+                )
+                return status
 
     def _publishSMS(self, message: HuaweiSMS):
         successful = True
@@ -242,6 +293,13 @@ class HuaweiAdapter(GSMAdapter):
         else:
             return False
 
+    def _isSimCardInserted(self) -> bool:
+        d = self._getRequest(url=PIN_STATUS_ACTION)
+        if (d['response']['SimState']) == "255":
+            return False
+        else:
+            return True
+
     def _getUnreadMessageCount(self):
         d = self._getRequest(url=NOTIFICATION_ACTION)
         count = int(d['response']['UnreadMessage'])
@@ -281,7 +339,10 @@ class HuaweiAdapter(GSMAdapter):
     def _getState(self):
         d = self._getRequest(MODEM_URL + 'api/monitoring/status')
         signalStrength = int(d['response']['SignalIcon'])
-        serviceStatus = int(d['response']['ServiceStatus'])
+        if 'ServiceStatus' in d['response']:
+            serviceStatus = int(d['response']['ServiceStatus'])
+        else:
+            serviceStatus = 0
 
         networkType = int(d['response']['CurrentNetworkType'])
         networkTypeName = "None"
@@ -300,10 +361,17 @@ class HuaweiAdapter(GSMAdapter):
         else:
             networkTypeName = "(3G)"
 
+        providerName = "Unkown"
+        if serviceStatus == 2:
+            d = self._getRequest(GET_PROVIDER_NAME)
+            if 'FullName' in d['response']:
+                providerName = d['response']['FullName']
+
         return {
             "signalStrength": signalStrength,
             "serviceAvailable": serviceStatus == 2,
-            "networkType": networkTypeName
+            "networkType": networkTypeName,
+            "providerName": providerName
         }
 
     def _setSmsRead(self, message: HuaweiSMS):

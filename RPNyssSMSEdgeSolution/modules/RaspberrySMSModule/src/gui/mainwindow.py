@@ -5,18 +5,20 @@ from PyQt5.QtCore import pyqtSlot
 from .status_tab import StatusTab
 from .sim_tab import SimTab
 import re
+from .view_controller import ViewController
+from gsm import GSMAdapter
 
 
 class MainWidget(QWidget):
 
-    def __init__(self, parent):
+    def __init__(self, parent, view_controller: ViewController):
         super(QWidget, self).__init__(parent)
         self.layout = QVBoxLayout()
         self.setObjectName("main")
         # Initialize tab screen
         self.tabs = QTabWidget()
         self.status = StatusTab()
-        self.umts = SimTab()
+        self.umts = SimTab(view_controller)
 
         self.footer_label = QLabel(
             "NYSS-Redcross SMS-Gateway. Version: 0.0.1-SNAPSHOT")
@@ -42,7 +44,7 @@ class MainWidget(QWidget):
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, view_controller: ViewController):
         super().__init__()
         self.title = 'PyQt5 tabs - pythonspot.com'
         self.left = 0
@@ -51,7 +53,7 @@ class MainWindow(QMainWindow):
         self.height = 320
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
-        self.table_widget = MainWidget(self)
+        self.table_widget = MainWidget(self, view_controller)
         self.setCentralWidget(self.table_widget)
         self.setObjectName("main")
 
@@ -81,12 +83,12 @@ def loadStylesSheet() -> str:
     return "\n".join(finalLines)
 
 
-def runGui():
+def runGui(adapter: GSMAdapter):
     app = QApplication(sys.argv)
 
     app.setStyleSheet(loadStylesSheet())
-
-    window = MainWindow()
+    view_controller = ViewController(adapter)
+    window = MainWindow(view_controller)
 
     app.exec_()
 

@@ -83,8 +83,12 @@ QPushButton:pressed {
   background-color: rgb(102, 102, 102);
 }
 
+
 QPushButton#primary {
   color: $color-primary;
+}
+QPushButton#primary:disabled {
+  color:rgb(50, 50, 50);
 }
 
 QDialog {

@@ -3,6 +3,7 @@ from smshandling.models import SMS
 from base import Base
 from time import sleep
 from gsm import SmsListener
+from gui import runGui
 
 def createDatabase(engine):
     print('creating database tables')
@@ -13,10 +14,9 @@ def createDatabase(engine):
     command.stamp(alembic_cfg, "head")
 
 
-def main(save_service):
+def main(gsm_adapter, save_service):
     print("Main started...")
-    while True:
-        sleep(1.)
+    runGui(gsm_adapter)
     # sleep(10)
     # for sms in save_service.getAllUnhandledSMS():
     #     print("Unhandeld SMS: {}".format(sms))
