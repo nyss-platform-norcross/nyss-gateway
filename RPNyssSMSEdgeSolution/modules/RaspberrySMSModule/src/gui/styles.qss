@@ -60,3 +60,43 @@ QLabel#footer {
   font-size: $font-size-x-small;
 
 }
+
+
+QWidget#gsmstatus > QLabel#status {
+  border-left: 2px solid $color-primary;
+  padding-left: 10px;
+}
+
+QPushButton {
+  color: $font-color;
+  font-size: $font-size-large;
+  height: 30px;
+  background-color: rgb(59, 59, 59);
+  border-radius: 5px;
+  border-width: 2px;
+}
+
+QPushButton:pressed {
+  color: $font-color;
+  font-size: $font-size-large;
+  height: 30px;
+  background-color: rgb(102, 102, 102);
+}
+
+QPushButton#primary {
+  color: $color-primary;
+}
+
+QDialog {
+  background: $bg-root-color;
+}
+
+QLineEdit {
+  color: $font-color;
+  font-size: $font-size-large;
+}
+
+QPushButton#number {
+  height: 40px;
+  width: 40px;
+}

@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAc
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot
 from .status_tab import StatusTab
+from .sim_tab import SimTab
 import re
 
 
@@ -15,15 +16,17 @@ class MainWidget(QWidget):
         # Initialize tab screen
         self.tabs = QTabWidget()
         self.status = StatusTab()
-        self.umts = QWidget()
+        self.umts = SimTab()
 
-        self.footer_label = QLabel("NYSS-Redcross SMS-Gateway. Version: 0.0.1-SNAPSHOT")
+        self.footer_label = QLabel(
+            "NYSS-Redcross SMS-Gateway. Version: 0.0.1-SNAPSHOT")
         self.footer_label.setObjectName("footer")
         # self.tabs.resize(300, 200)
 
         # Add tabs
         self.tabs.addTab(self.status, "Status")
         self.tabs.addTab(self.umts, "SIM")
+        self.tabs.setCurrentIndex(1)
 
         # Add tabs to widget
         self.layout.addWidget(self.tabs)
@@ -54,6 +57,7 @@ class MainWindow(QMainWindow):
 
         self.show()
 
+
 def loadStylesSheet() -> str:
     with open("gui/styles.qss", 'r') as hd:
         lines = hd.readlines()
@@ -64,7 +68,8 @@ def loadStylesSheet() -> str:
         for line in lines:
             groups = re.findall(r'^(\$[a-zA-Z-]+):\s+(.*);$', line)
             if (len(groups) == 1) and len(groups[0]) == 2:
-                variables.append((groups[0][0].replace('$', '\$'), groups[0][1]))
+                variables.append(
+                    (groups[0][0].replace('$', '\$'), groups[0][1]))
             else:
                 styleWithoutVariables.append(line)
 
