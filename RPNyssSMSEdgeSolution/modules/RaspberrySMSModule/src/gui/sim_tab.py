@@ -4,7 +4,7 @@ from PyQt5.QtCore import pyqtSlot, QTimer, QDirIterator
 from PyQt5.QtCore import Qt
 import functools
 from .view_controller import ViewController
-
+from .signal_strength_chart import LinearTimeValueChart
 from gsm import GSMStatus
 
 
@@ -17,6 +17,8 @@ class SimTab(QWidget):
 
         self._createGSMStatus()
 
+        chart = LinearTimeValueChart(self)
+        self.layout.addWidget(chart)
         self._create_sim_unlock()
 
         view_controller.gsmstatus.connect(self.gsm_status)
