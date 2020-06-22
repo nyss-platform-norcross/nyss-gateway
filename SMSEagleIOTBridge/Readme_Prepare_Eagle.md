@@ -1,5 +1,5 @@
 # 1. Preparations before deployment
-## 1.1. Add UTC as an option on the SMSEage
+## 1.1. Add UTC as an option on the SMSEagle
 The SMSEagle does not have an option to set its time to UTC. Its possible to set it to a country which has UTC without a switch to sumertime, e.g. Africa/Dakar is a possibility. 
 
 To make it a bit nicer in the SMSEagles frontend, we can add UTC as an option to choose, which will always request GMT0 from the timeserver.
