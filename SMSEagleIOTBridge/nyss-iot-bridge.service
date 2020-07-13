@@ -1,11 +1,16 @@
 [Unit]
 Description=This is the service for the iot bridge to azure
-After=multi-user.target
- 
+Wants=network-online.target
+After=network.target network-online.target
+Requires=network-online.target
+
+
 [Service]
 Type=simple
+Restart=always
+RestartSec=10
+ExecStartPre=/bin/sh -c 'until ping -c1 azure.microsoft.com; do sleep 5; done;'
 ExecStart=/usr/bin/python3 /home/pi/smsEagle-iot-hub-handler.py
-Restart=on-abort
- 
+
 [Install]
 WantedBy=multi-user.target
