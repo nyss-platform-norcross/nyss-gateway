@@ -136,8 +136,8 @@ The python script is developed in the following repository:
 * https://github.com/nyss-platform-norcross/nyss-sms-gateway
 
 You need the following files:
-* https://github.com/nyss-platform-norcross/nyss-sms-gateway/blob/sms-eagle-iot-connection/SMSEagleIOTBridge/nyssIotBridge.py 
-* https://github.com/nyss-platform-norcross/nyss-sms-gateway/blob/sms-eagle-iot-connection/SMSEagleIOTBridge/smsEagle-iot-hub-handler.py
+* https://github.com/nyss-platform-norcross/nyss-sms-gateway/blob/master/SMSEagleIOTBridge/nyssIotBridge.py 
+* https://github.com/nyss-platform-norcross/nyss-sms-gateway/blob/master/SMSEagleIOTBridge/smsEagle-iot-hub-handler.py
 
 If the repository does not exist anymore for some reason, you can probably find the files on one of the existing SMSEagles in the folder /home/pi. 
 After you have downloaded them, make sure that the filename is exactly that, and e.g. windows did not "accidentally" add .txt as an extension.
@@ -158,12 +158,12 @@ scp "C:/path on windows to file" root@ipOfEagle:/home/pi
 If you installed Python using what is described in Chapter 1.2.2.1., you can skip step 2.
 
 #### 1. Get the necessary files
-
-The service file is in the same repository as the python script:
+You need the service file as well as the shell script to run before the service starts. The files are in the same repository as the python script:
 - https://github.com/nyss-platform-norcross/nyss-sms-gateway
 
-You need the following file:
-* https://github.com/nyss-platform-norcross/nyss-sms-gateway/blob/sms-eagle-iot-connection/SMSEagleIOTBridge/nyss-iot-bridge.service
+You need the following files:
+* https://github.com/nyss-platform-norcross/nyss-sms-gateway/blob/master/SMSEagleIOTBridge/nyss-iot-bridge.service
+* https://github.com/nyss-platform-norcross/nyss-sms-gateway/blob/master/SMSEagleIOTBridge/nyssIotBridgeBoot.sh
 
 If the repository does not exist anymore for some reason, you can probably find the files on one of the existing SMSEagles in the folder /etc/systemd/system.
 
@@ -194,10 +194,14 @@ Copy the following file to the SMSEagles /etc/systemd/system folder:
 ```
 nyss-iot-bridge.service
 ```
-
+And the following file to the SMSEagles /home/pi folder
+```
+nyssIotBridgeBoot.sh
+```
 Via ssh you can use the following commands as run from your host computer and not the SMSEagle:
 ```
-scp "C:/path on windows to file" root@ipOfEagle:/etc/systemd/system
+scp "C:/path on windows to service file" root@ipOfEagle:/etc/systemd/system
+scp "C:/path on windows to shell script file" root@ipOfEagle:/home/pi
 ```
 
 SSH back to the SMSEagle and set the access rights on the files using the following commands:

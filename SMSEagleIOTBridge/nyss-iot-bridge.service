@@ -10,7 +10,7 @@ Type=simple
 Restart=always
 RestartSec=10
 ExecStartPre=/bin/sh /home/pi/nyssIotBridgeBoot.sh
-ExecStart=/usr/local/bin/python3.6 /home/pi/smsEagle-iot-hub-handler.py
+ExecStart=/usr/bin/python3 /home/pi/smsEagle-iot-hub-handler.py
 
 [Install]
 WantedBy=multi-user.target
