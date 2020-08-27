@@ -64,7 +64,7 @@ def get_local_ips(params):
 
 def get_iot_hub_handler_version(params):
     version = open('/home/pi/iot-hub-handler-version.txt', 'r')
-    return str(version.read())
+    return str(version.read().replace('\n',''))
 
 
 if __name__ == "__main__":
