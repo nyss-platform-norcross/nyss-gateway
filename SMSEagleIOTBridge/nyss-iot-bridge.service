@@ -9,8 +9,8 @@ Requires=network-online.target
 Type=simple
 Restart=always
 RestartSec=10
-ExecStartPre=/bin/sh -c 'until ping -c1 azure.microsoft.com; do sleep 5; done;'
-ExecStart=/usr/bin/python3 /home/pi/smsEagle-iot-hub-handler.py
+ExecStartPre=/bin/sh /home/pi/nyssIotBridgeBoot.sh
+ExecStart=/usr/local/bin/python3.6 /home/pi/smsEagle-iot-hub-handler.py
 
 [Install]
 WantedBy=multi-user.target
