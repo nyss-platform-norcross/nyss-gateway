@@ -45,8 +45,8 @@ vi /var/www/application/helpers/timezone_helper.php
 * Add a user at the far top right
 * Use whatever name and password combination you want, but it needs to match whatever you set in the environment variables in 1.2.5
 * The level should be user
-* Access to API MUST should be turned to custom and access to send_sms
-* If the custom access is to difficult you can also set it to on :)
+* Preferably the access to API is set to custom with access to send_sms, but it can also be just set to on
+
 ### 1.2.2. Install python3 and dependencies on SMSEagle
 
 You only have to do 1.2.2.1 or 1.2.2.2. If you have managed to install it with 1.2.2.1 you can jump directly to 1.2.3.!
