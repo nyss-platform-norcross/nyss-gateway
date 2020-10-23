@@ -5,6 +5,7 @@ import logging
 import os
 import subprocess
 import sys
+import threading
 
 # Python 3 needs to be installed on the SMSEagle to start this script, using "do-not-use_apt-get"
 # do-not-use_apt-get update
@@ -19,7 +20,6 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S')
 
 logger = logging.getLogger("iot-hub-bridge")
-
 
 def get_sys_arg(i):
     return sys.argv[i] if i < len(sys.argv) else None
@@ -48,14 +48,23 @@ def send_sms(params):
 def ping_device(params):
     return "I am alive!"
 
+def handle_reboot():
+    time.sleep(5)
+    os.system('reboot')
 
 def reboot_device(params):
-    os.system('reboot')
-    return str("Rebooting in 1 minute.")
+    # handle reboot on a new thread in order to respond to azure before rebooting
+    reboot_thread = threading.Thread(target=handle_reboot)
+    reboot_thread.start()
+    return str("Device is rebooting.")
 
 
 def get_local_ips(params):
     return str(subprocess.getoutput('hostname -I'))
+
+def get_iot_hub_handler_version(params):
+    version = open('/home/pi/iot-hub-handler-version.txt', 'r')
+    return str(version.read().replace('\n',''))
 
 
 if __name__ == "__main__":
@@ -64,6 +73,7 @@ if __name__ == "__main__":
         'ping_device': ping_device,
         'reboot_device': reboot_device,
         'get_local_ips': get_local_ips,
+        'get_iot_hub_handler_version': get_iot_hub_handler_version
     }
 
     nyssIotBridge.init(IOT_HUB_CONNECTIONSTRING, methods)
