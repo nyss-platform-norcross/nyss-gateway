@@ -66,6 +66,9 @@ def get_iot_hub_handler_version(params):
     version = open('/home/pi/iot-hub-handler-version.txt', 'r')
     return str(version.read().replace('\n',''))
 
+def set_log_level(params):
+    logging.getLogger().setLevel(params["level"])
+    return str(logging.getLevelName(logging.root.level))
 
 if __name__ == "__main__":
     methods = {
@@ -73,7 +76,8 @@ if __name__ == "__main__":
         'ping_device': ping_device,
         'reboot_device': reboot_device,
         'get_local_ips': get_local_ips,
-        'get_iot_hub_handler_version': get_iot_hub_handler_version
+        'get_iot_hub_handler_version': get_iot_hub_handler_version,
+        'set_log_level': set_log_level
     }
 
     nyssIotBridge.init(IOT_HUB_CONNECTIONSTRING, methods)
