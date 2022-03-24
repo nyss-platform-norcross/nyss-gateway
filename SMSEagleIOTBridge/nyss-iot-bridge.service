@@ -9,7 +9,7 @@ Requires=network-online.target
 Type=simple
 Restart=always
 RestartSec=10
-ExecStartPre=/bin/sh /home/pi/nyssIotBridgeBoot.sh
+ExecStartPre=/bin/bash /home/pi/nyssIotBridgeBoot.sh
 ExecStart=/usr/bin/python3 /home/pi/smsEagle-iot-hub-handler.py
 
 [Install]
