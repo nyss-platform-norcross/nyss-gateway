@@ -1,14 +1,26 @@
 # 1. Preparations before deployment
-## 1.1. Add UTC as an option on the SMSEagle
+
+## 1.1. Enter the shell on the SMSEagle
+
+1. Find the correct IP address for the SMSEagle
+```
+arp -a
+```
+There is a MAC Address on the bottom of the device to confirm the correct IP address.
+
+2. Open a shell on the SMSEagle
+```
+ssh root@ipOfEagle
+```
+
+2. Add the option in the datetime_helper.php script:
+
+
 The SMSEagle does not have an option to set its time to UTC. Its possible to set it to a country which has UTC without a switch to sumertime, e.g. Africa/Dakar is a possibility. 
 
 To make it a bit nicer in the SMSEagles frontend, we can add UTC as an option to choose, which will always request GMT0 from the timeserver.
 
-1. Open a shell on the SMSEagle
-```
-ssh root@ipOfEagle
-```
-2. Add the option in the datetime_helper.php script:
+
 ```
 vi /mnt/ramdisk/www/application/helpers/timezone_helper.php
 ```
