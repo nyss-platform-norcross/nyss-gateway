@@ -13,51 +13,172 @@ There is a MAC Address on the bottom of the device to confirm the correct IP add
 ssh root@ipOfEagle
 ```
 
-2. Add the option in the datetime_helper.php script:
+## 1.2. Enter SMSEagle web interface
+
+1. Enter the IP Address of the Eagle in the browser
+
+2. Log in with the standard admin credentials (admin/password)
+
+3. Go to Settings -> Date/Time and change the time to UTC
 
 
-The SMSEagle does not have an option to set its time to UTC. Its possible to set it to a country which has UTC without a switch to sumertime, e.g. Africa/Dakar is a possibility. 
+## 1.3. Set up user for Azure IoT Hub connection
 
-To make it a bit nicer in the SMSEagles frontend, we can add UTC as an option to choose, which will always request GMT0 from the timeserver.
+1. In the Eagle web interface, find 'users' in the left vertical navbar
+
+2. Add a user at the far top right 
+
+3. Use whatever name/password combination you want
+
+4. The level should be user
+
+5. Set the API access to custom with access to only 'send_sms'
+
+## 1.4. Install Python 3.6.5 and dependencies on SMSEagle
+
+1. Make sure you are inside a bash on the SMSEagle, as described in 1.1.2
+
+2. Run these commands
+
+```
+cd /home/pi
+
+do-not-use_apt-get update
+
+do-not-use_apt-get install libffi-dev libbz2-dev liblzma-dev libsqlite3-dev libncurses5-dev libgdbm-dev zlib1g-dev libreadline-dev libssl-dev tk-dev build-essential libncursesw5-dev libc6-dev openssl git
+
+wget https://www.python.org/ftp/python/3.6.5/Python-3.6.5.tar.xz
+tar xf Python-3.6.5.tar.xz
+cd Python-3.6.5
+```
+3. Configure Python 3.6.5 
+
+Ideally we want to run these commands with the --enable-optimizationsn flag, but this is very time consuming, and might fail. If so, simply run the command without it. 
+```
+./configure --enable-optimizations
+make -j -l 4
+make altinstall
+```
+
+4. Add a new alias to the bashrc:
+
+Enter the text editor for bashrc with the following command:
+```
+nano ~/.bashrc
+```
+Add this alias to the bash
+
+```
+alias python3='python3.6'
+```
+
+5. Reboot the device
+
+6. Check Phyton version
+
+```
+python3 -V
+```
+
+should give
+
+```
+Python 3.6.5
+```
+
+7. Upgrade pip and install dependencies
+
+```
+python3 -m pip install --upgrade pip
+```
+
+After that, pip3 should be usable to install the azure-iot-hub module:
+
+```
+pip3 install azure-iot-device
+```
 
 
-```
-vi /mnt/ramdisk/www/application/helpers/timezone_helper.php
-```
-Add the following option to the top of the timezone array:
-```
-'UTC' => 'GMT0',
-```
-So we end up with:
-```
-function getTimeInformation($filter = '') {
-        
-        $timezone = array(
-            'UTC' => 'GMT0',
-            'Africa/Abidjan' => 'GMT0',
-            'Africa/Accra' => 'GMT0',
-            ...
-```
-The used shortkeys for vi are:
-"o" - create new line and enter mode to type in stuff
-"escape" - exit from interactive (type in) mode
-":w" - save file
-":q" - exit file
-3. Do the same in the following file  (otherwise the option will not be available after a reboot)
-```
-vi /var/www/application/helpers/timezone_helper.php
-```
-4. Go to the SMSEagles web interface, Settings -> Date/Time and set it to the UTC option you created before.
+### 1.5. Copy python script
+The connection of the SMSEagle to the Azure IOT hub is done via a python script. That script runs on the SMSEagle. The Azure IOT hub connection string and the user for the http API of the SMSEagle need to be set.
 
-## 1.2. Setup of Azure IOT-Hub connection 
-### 1.2.1. Create user for python script
-* Find the IP of your SMSEagle
-* Login with details admin/password
-* Click users in the left vertical navbar
-* Add a user at the far top right
-* Use whatever name and password combination you want, but it needs to match whatever you set in the environment variables in 1.2.5
-* The level should be user
-* Preferably the access to API is set to custom with access to send_sms, but it can also be just set to on
+The python script is developed in the following repository:
+* https://github.com/nyss-platform-norcross/nyss-sms-gateway
+
+1. Enter the correct folder
+
+```
+cd /home/pi
+```
+
+2. Download the following scripts with curl
+
+```
+curl -o nyssIoTBridge.py https://github.com/nyss-platform-norcross/nyss-sms-gateway/blob/master/SMSEagleIOTBridge/nyssIotBridge.py 
+
+curl -o smsEagle-iot-hub-handler.py https://github.com/nyss-platform-norcross/nyss-sms-gateway/blob/master/SMSEagleIOTBridge/smsEagle-iot-hub-handler.py
+```
+
+### 1.6. Copy service files
+
+1. Enter the correct folder
+
+```
+cd /etc/systemd/system
+```
+2. Download service files with curl
+```
+curl -o nyss-iot-bridge.service https://github.com/nyss-platform-norcross/nyss-sms-gateway/blob/master/SMSEagleIOTBridge/nyss-iot-bridge.service 
+
+curl -o nyssIoTBridgeBoot.sh https://github.com/nyss-platform-norcross/nyss-sms-gateway/blob/master/SMSEagleIOTBridge/nyssIotBridgeBoot.sh
+```
+3. Set the access rights on the files
+```
+chmod 644 /etc/systemd/system/nyss-iot-bridge.service
+chmod +x /home/pi/smsEagle-iot-hub-handler.py
+```
+
+### 1.7. Set environment variables
+
+The python service on the SMSEagle tries to retrieve the IOT Hub connecting string and the login details for the SMSEagles http API either from arguments to starting the script or from environment variables (arguments take precedence). The environment variables should be set in the following way. This way makes it sure for the user that the SMSEagles services are run on, has access to the env variables.
+
+1. Check that the service file is in the correct place
+
+After the service is configured as in the previous chapter, the following file should exist:
+
+```
+/etc/systemd/system/nyss-iot-bridge.service
+```
+The environment variables are configured using a so called Drop-In file.  The following describes how to create and fill it directly on the SMSEagle.
+
+2. Create the following folder
+```
+mkdir /etc/systemd/system/nyss-iot-bridge.service.d
+``` 
+3. Create the file
+``` 
+touch /etc/systemd/system/nyss-iot-bridge.service.d/override.conf
+```
+
+4. Enter text editor
+
+```
+nano /etc/systemd/system/nyss-iot-bridge.service.d/override.conf
+``` 
+
+5. Fill in environment variables
+
+The file takes the environment variables and should look e.g. as such (make sure that if you just copy it from here, and paste using nano, you are not missing the beginning of the first line. The buffer seems to be too small.):
+
+```
+[Service]
+Environment="IOT_HUB_CONNECTIONSTRING=HostName=iothuburl;DeviceId=somedevice;SharedAccessKey=somerandomkey"
+Environment="SMSEAGLE_USERNAME=usernameyoucreatedbefore"
+Environment="SMSEAGLE_PWD=pwdyoucreatedbefore"
+```
+
+######
+
 
 ### 1.2.2. Install python3 and dependencies on SMSEagle
 
@@ -404,3 +525,74 @@ eTime\" >= '2018-01-01 00:00:00' and \"ReceivingDateTime\" < '2020-02-19 00:00:0
 psql -U postgres -d smseagle -c "INSERT INTO plugin_callback_waitqueue (id_inbox, sms_timestamp) SELECT \"ID\", \"ReceivingDateTime\" FROM inbox WHERE \"SenderNumber\" = 'sendernumber in format ++479999999';"
 ````
 5) If you have not also edited the file /var/www/application/plugins/callback/models/callback_model.php, everything will default back to the SMSEagles original php code after you reboot.
+
+
+
+
+EXTRA 
+
+2. Add the option in the datetime_helper.php script:
+
+
+The SMSEagle does not have an option to set its time to UTC. Its possible to set it to a country which has UTC without a switch to sumertime, e.g. Africa/Dakar is a possibility. 
+
+To make it a bit nicer in the SMSEagles frontend, we can add UTC as an option to choose, which will always request GMT0 from the timeserver.
+
+
+```
+vi /mnt/ramdisk/www/application/helpers/timezone_helper.php
+```
+Add the following option to the top of the timezone array:
+```
+'UTC' => 'GMT0',
+```
+So we end up with:
+```
+function getTimeInformation($filter = '') {
+        
+        $timezone = array(
+            'UTC' => 'GMT0',
+            'Africa/Abidjan' => 'GMT0',
+            'Africa/Accra' => 'GMT0',
+            ...
+```
+The used shortkeys for vi are:
+"o" - create new line and enter mode to type in stuff
+"escape" - exit from interactive (type in) mode
+":w" - save file
+":q" - exit file
+3. Do the same in the following file  (otherwise the option will not be available after a reboot)
+```
+vi /var/www/application/helpers/timezone_helper.php
+```
+4. Go to the SMSEagles web interface, Settings -> Date/Time and set it to the UTC option you created before.
+
+## 1.2. Setup of Azure IOT-Hub connection 
+### 1.2.1. Create user for python script
+* Find the IP of your SMSEagle
+* Login with details admin/password
+* Click users in the left vertical navbar
+* Add a user at the far top right
+* Use whatever name and password combination you want, but it needs to match whatever you set in the environment variables in 1.2.5
+* The level should be user
+* Preferably the access to API is set to custom with access to send_sms, but it can also be just set to on
+
+
+
+You need the following files:
+* https://github.com/nyss-platform-norcross/nyss-sms-gateway/blob/master/SMSEagleIOTBridge/nyssIotBridge.py 
+* https://github.com/nyss-platform-norcross/nyss-sms-gateway/blob/master/SMSEagleIOTBridge/smsEagle-iot-hub-handler.py
+
+If the repository does not exist anymore for some reason, you can probably find the files on one of the existing SMSEagles in the folder /home/pi. 
+After you have downloaded them, make sure that the filename is exactly that, and e.g. windows did not "accidentally" add .txt as an extension.
+
+Copy the following files to the SMSEagles /home/pi folder:
+```
+nyssIotBridge.py
+smsEagle-iot-hub-handler.py
+```
+
+Via ssh you can use the following commands:
+```
+scp "C:/path on windows to file" root@ipOfEagle:/home/pi
+```
