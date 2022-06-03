@@ -149,11 +149,44 @@ chmod 644 /etc/systemd/system/nyss-iot-bridge.service
 chmod +x /home/pi/smsEagle-iot-hub-handler.py
 ```
 
+### 2.4. Download and run setup script
+
+This repository also contains a setup shell script that can be downloaded to skip steps 2.3-2.4
+
+1. Download setup script
+
+```
+curl -o setup.sh https://raw.githubusercontent.com/nyss-platform-norcross/nyss-sms-gateway/master/SMSEagleIOTBridge/setup.sh
+```
+2. Make it executable
+```
+chmod +x setup.sh
+```
+3. Run the script
+```
+bash setup.sh
+```
+The terminal will prompt you to add the environment variables necessary to run the service file. 
+IOT_HUB_CONNECTIONSTRING = connection string from Azure IoT device
+SMSEAGLE_USERNAME = username created in SMSEagle (Step 1.3.3)
+SMSEAGLE_PWD = password created in SMSEagle (Step 1.3.3)
+
+
+
 ### 2.3. Set environment variables
+
+(This step is only necessary if you did not run the setup script)
 
 The python service on the SMSEagle tries to retrieve the IOT Hub connecting string and the login details for the SMSEagles http API either from arguments to starting the script or from environment variables (arguments take precedence). The environment variables should be set in the following way. This way makes it sure for the user that the SMSEagles services are run on, has access to the env variables.
 
-1. Check that the service file is in the correct place
+1. Create correct folder path
+
+```
+mkdir /home/pi
+```  
+
+
+2. Check that the service file is in the correct place
 
 After the service is configured as in the previous chapter, the following file should exist:
 
@@ -162,22 +195,22 @@ After the service is configured as in the previous chapter, the following file s
 ```
 The environment variables are configured using a so called Drop-In file.  The following describes how to create and fill it directly on the SMSEagle.
 
-2. Create the following folder
+3. Create the following folder
 ```
 mkdir /etc/systemd/system/nyss-iot-bridge.service.d
 ``` 
-3. Create the file
+4. Create the file
 ``` 
 touch /etc/systemd/system/nyss-iot-bridge.service.d/override.conf
 ```
 
-4. Enter text editor
+5. Enter text editor
 
 ```
 nano /etc/systemd/system/nyss-iot-bridge.service.d/override.conf
 ``` 
 
-5. Fill in environment variables
+6. Fill in environment variables
 
 The file takes the environment variables and should look e.g. as such (make sure that if you just copy it from here, and paste using nano, you are not missing the beginning of the first line. The buffer seems to be too small.):
 
@@ -200,10 +233,7 @@ systemctl enable nyss-iot-bridge.service
 systemctl start nyss-iot-bridge.service
 reboot
 ```
-2. Check status of service file
-```
-systemctl status nyss-iot-bridge.service
-```
+
 3. You can also check the python script log
 ```
 nano /var/log/iot-bridge-log.log
