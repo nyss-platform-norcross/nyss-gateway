@@ -125,9 +125,11 @@ chmod +x setup.sh
 bash setup.sh
 ```
 The terminal will prompt you to add the environment variables necessary to run the service file. 
+```
 IOT_HUB_CONNECTIONSTRING = connection string from Azure IoT device
 SMSEAGLE_USERNAME = username created in SMSEagle (Step 1.3.3)
 SMSEAGLE_PWD = password created in SMSEagle (Step 1.3.3)
+```
 
 # 3 Deployment without setup script (aka The Hard Way)
 
