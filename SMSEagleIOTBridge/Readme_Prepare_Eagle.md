@@ -108,19 +108,45 @@ After that, pip3 should be usable to install the azure-iot-hub module:
 pip3 install azure-iot-device
 ```
 
-# 2 Deployment
+# 2 Deployment with setup script
 
-### 2.1. Copy python script
+2.1. Download and run setup script
+
+This repository also contains a setup shell script that can be downloaded to skip steps 2.3-2.4
+
+### 2.1. Download setup script (aka The Easy Way)
+
+```
+curl -o setup.sh https://raw.githubusercontent.com/nyss-platform-norcross/nyss-sms-gateway/master/SMSEagleIOTBridge/setup.sh
+```
+### 2.2. Make it executable
+```
+chmod +x setup.sh
+```
+### 2.3. Run the script
+```
+bash setup.sh
+```
+The terminal will prompt you to add the environment variables necessary to run the service file. 
+IOT_HUB_CONNECTIONSTRING = connection string from Azure IoT device
+SMSEAGLE_USERNAME = username created in SMSEagle (Step 1.3.3)
+SMSEAGLE_PWD = password created in SMSEagle (Step 1.3.3)
+
+# 3 Deployment without setup script (aka The Hard Way)
+
+If for some reason, the setup script shouldn't work. Here is how to do it manually.
+
+### 3.1. Copy python script
 The connection of the SMSEagle to the Azure IOT hub is done via a python script. That script runs on the SMSEagle. The Azure IOT hub connection string and the user for the http API of the SMSEagle need to be set.
 
 The python script is developed in the following repository:
 * https://github.com/nyss-platform-norcross/nyss-sms-gateway
 
-1. Enter the correct folder
+1. Create correct folder path
 
 ```
-cd /home/pi
-```
+mkdir /home/pi
+```  
 
 2. Download the following scripts with curl
 
@@ -130,7 +156,7 @@ curl -o nyssIoTBridge.py https://raw.githubusercontent.com/nyss-platform-norcros
 curl -o smsEagle-iot-hub-handler.py https://raw.githubusercontent.com/nyss-platform-norcross/nyss-sms-gateway/master/SMSEagleIOTBridge/smsEagle-iot-hub-handler.py
 ```
 
-### 2.2. Copy service files
+### 3.2. Copy service files
 
 1. Enter the correct folder
 
@@ -149,40 +175,17 @@ chmod 644 /etc/systemd/system/nyss-iot-bridge.service
 chmod +x /home/pi/smsEagle-iot-hub-handler.py
 ```
 
-### 2.4. Download and run setup script
 
-This repository also contains a setup shell script that can be downloaded to skip steps 2.3-2.4
-
-1. Download setup script
-
-```
-curl -o setup.sh https://raw.githubusercontent.com/nyss-platform-norcross/nyss-sms-gateway/master/SMSEagleIOTBridge/setup.sh
-```
-2. Make it executable
-```
-chmod +x setup.sh
-```
-3. Run the script
-```
-bash setup.sh
-```
-The terminal will prompt you to add the environment variables necessary to run the service file. 
-IOT_HUB_CONNECTIONSTRING = connection string from Azure IoT device
-SMSEAGLE_USERNAME = username created in SMSEagle (Step 1.3.3)
-SMSEAGLE_PWD = password created in SMSEagle (Step 1.3.3)
-
-
-
-### 2.3. Set environment variables
+### 3.3. Set environment variables
 
 (This step is only necessary if you did not run the setup script)
 
 The python service on the SMSEagle tries to retrieve the IOT Hub connecting string and the login details for the SMSEagles http API either from arguments to starting the script or from environment variables (arguments take precedence). The environment variables should be set in the following way. This way makes it sure for the user that the SMSEagles services are run on, has access to the env variables.
 
-1. Create correct folder path
+1. Make sure you are in the right directory
 
 ```
-mkdir /home/pi
+cd /home/pi
 ```  
 
 
@@ -223,7 +226,7 @@ Environment="SMSEAGLE_PWD=pwdyoucreatedbefore"
 The connection string is what you configured in step 1.4.4
 The username and password is what you configured in step 1.3.3
 
-## 2.4 Start service & Wrap up
+## 3.4 Start service & Wrap up
 
 1. Reload and restart service file
 
@@ -239,15 +242,15 @@ reboot
 nano /var/log/iot-bridge-log.log
 ```
 
-# 3. Status checks and common failures
+# 4. Status checks and common failures
 
-## 3.1 Check the service is running
+## 4.1 Check the service is running
 After reboot, run the following command
-´´´
+```
 systemctl status nyss-iot-bridge.service
-´´´
+```
 The message should show something like this
-´´´
+```
  nyss-iot-bridge.service - This is the service for the iot bridge to azure
    Loaded: loaded (/etc/systemd/system/nyss-iot-bridge.service; enabled)
   Drop-In: /etc/systemd/system/nyss-iot-bridge.service.d
@@ -258,16 +261,17 @@ The message should show something like this
            └─1699 /usr/bin/python3 /home/pi/smsEagle-iot-hub-handler.py
 
 Mar 09 10:48:17 smseagle systemd[1]: Started This is the service for the iot bridge to azure.
-´´´
-#  4. Post old SMS from the SMSEagle to the platform
+```
 
-## 4.1. Motivation
+#  5. Post old SMS from the SMSEagle to the platform
+
+## 5.1. Motivation
 
 Sometimes the SMSEagle does not have a local internet connection, while the mobile network continues to work. In that situation, the Eagle will continue to receive SMS, but they will not be posted to the platform after 24 hours of their arrival in the SMSEagle.
 
 This document describes how to make the Eagle repost them to the Nyss platform.
 
-## 4.2. Preparation
+## 5.2. Preparation
 
 1) Turn off the 24 hours limit (perhaps this step can be skipped, if we copy a date less than 24 hours in the past into the callback queue table!)
 
@@ -311,7 +315,7 @@ i.e. change UpdateInDB to ReceivingDateTime.
 If you want to make that stick after a reboot, you'll have to do the same in the file /var/www/application/plugins/callback/models/callback_model.php .
 
 
-## 4.3. Making the SMSEagle repost the SMS
+## 5.3. Making the SMSEagle repost the SMS
 
 The Eagle uses a postgresql database. SMS are stored in the inbox table. The callback plugin uses a queue table in the same database. That table is regularly (every couple of minutes) checked, and every entry in there is posted to whatever is defined as a callback rule.
 Hence we can just copy over all the SMS we want to repost from the inbox table to the callback table.
