@@ -16,6 +16,7 @@ read IOT_CONNECTIONSTRING
 echo "Fetching Nyss scripts …"
 
 
+
 curl -s -o /home/pi/smsEagle-iot-hub-handler.py https://raw.githubusercontent.com/nyss-platform-norcross/nyss-sms-gateway/feature/update-handler-script/SMSEagleIOTBridge/smsEagle-iot-hub-handler.py
 res=$?
 if test "$res" != "0"
@@ -72,6 +73,10 @@ echo "[Service]" >> /etc/systemd/system/nyss-iot-bridge.service.d/override.conf
 echo "Environment=\"IOT_HUB_CONNECTIONSTRING=$IOT_CONNECTIONSTRING\"" >> /etc/systemd/system/nyss-iot-bridge.service.d/override.conf
 echo "Environment=\"SMSEAGLE_USERNAME=$IOT_USERNAME\"" >> /etc/systemd/system/nyss-iot-bridge.service.d/override.conf
 echo "Environment=\"SMSEAGLE_PWD=$IOT_PASSWORD\"" >> /etc/systemd/system/nyss-iot-bridge.service.d/override.conf
+
+python3 -m pip install --upgrade pip
+pip3 install azure-iot-device
+pip3 install six
 
 echo "Starting the nyss service …"
 
