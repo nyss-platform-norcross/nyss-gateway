@@ -4,6 +4,37 @@ if [ ! -d "/home/pi" ]; then
     mkdir /home/pi
 fi
 
+version=$(python3 -V 2>&1)
+parser="${version/\Python /}"
+parsedVersion=$(echo "${parser//./}")
+short="${parsedVersion:0:2}"
+if [[ "$short" -lt "40" && "$short" -gt "36" ]]
+then 
+    echo "Correct version of Python installed"
+else
+    echo "Installing correct version of Python..."
+    read -r -p "Do you want to enable setup optimizations? This may take a significant amount of time (y/n) " yn
+    do-not-use_apt-get update
+    do-not-use_apt-get install libffi-dev libbz2-dev liblzma-dev libsqlite3-dev libncurses5-dev libgdbm-dev zlib1g-dev libreadline-dev libssl-dev tk-dev build-essential libncursesw5-dev libc6-dev openssl git
+    wget https://www.python.org/ftp/python/3.6.5/Python-3.6.5.tar.xz
+    tar xf Python-3.6.5.tar.xz
+
+    case $yn in
+      [yY] ) /home/pi/Python-3.6.5/configure ;;
+      [nN] ) /home/pi/Python-3.6.5/configure --enable-optimizations ;;
+      * ) echo invalid response;
+        		exit 1;;
+    esac
+
+    make -j -l 4
+    make altinstall
+    reboot
+    python3 -m pip install --upgrade pip
+    pip3 install azure-iot-device
+    pip3 install six
+fi
+
+
 echo "Username of SMS Eagle IoT Hub user:"
 read IOT_USERNAME
 
@@ -15,9 +46,7 @@ read IOT_CONNECTIONSTRING
 
 echo "Fetching Nyss scripts …"
 
-python3 -m pip install --upgrade pip
-pip3 install azure-iot-device
-pip3 install six
+
 
 curl -s -o /home/pi/smsEagle-iot-hub-handler.py https://raw.githubusercontent.com/nyss-platform-norcross/nyss-sms-gateway/feature/update-handler-script/SMSEagleIOTBridge/smsEagle-iot-hub-handler.py
 res=$?
