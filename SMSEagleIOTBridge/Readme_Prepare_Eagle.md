@@ -70,6 +70,8 @@ SMSEAGLE_PWD = password created in SMSEagle (Step 1.3.3)
 
 # 3 Deployment without setup script (aka The Hard Way)
 
+### 3.1. Copy python script
+
 Install Python 3.6.5 and dependencies on SMSEagle
 
 1. Make sure you are inside a bash on the SMSEagle, as described in 1.1.2
@@ -137,7 +139,7 @@ pip3 install azure-iot-device
 If you followed step 2.1-2.3, you can move straight on to step 4.
 If for some reason, the setup script shouldn't work. Here is how to do it manually.
 
-### 3.1. Copy python script
+### 3.2. Copy python script
 The connection of the SMSEagle to the Azure IOT hub is done via a python script. That script runs on the SMSEagle. The Azure IOT hub connection string and the user for the http API of the SMSEagle need to be set.
 
 The python script is developed in the following repository:
@@ -157,7 +159,7 @@ curl -o nyssIoTBridge.py https://raw.githubusercontent.com/nyss-platform-norcros
 curl -o smsEagle-iot-hub-handler.py https://raw.githubusercontent.com/nyss-platform-norcross/nyss-sms-gateway/master/SMSEagleIOTBridge/smsEagle-iot-hub-handler.py
 ```
 
-### 3.2. Copy service files
+### 3.3. Copy service files
 
 1. Enter the correct folder
 
@@ -177,7 +179,7 @@ chmod +x /home/pi/smsEagle-iot-hub-handler.py
 ```
 
 
-### 3.3. Set environment variables
+### 3.4. Set environment variables
 
 (This step is only necessary if you did not run the setup script)
 
@@ -227,7 +229,7 @@ Environment="SMSEAGLE_PWD=pwdyoucreatedbefore"
 The connection string is what you configured in step 1.4.4
 The username and password is what you configured in step 1.3.3
 
-## 3.4 Start service & Wrap up
+## 3.5. Start service & Wrap up
 
 1. Reload and restart service file
 
