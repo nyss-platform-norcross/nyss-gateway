@@ -8,6 +8,7 @@ version=$(python3 -V 2>&1)
 parser="${version/\Python /}"
 parsedVersion=$(echo "${parser//./}")
 short="${parsedVersion:0:2}"
+
 if [[ "$short" -lt "40" && "$short" -gt "36" ]]
 then 
     echo "Correct version of Python installed"
@@ -19,20 +20,20 @@ else
     wget https://www.python.org/ftp/python/3.6.5/Python-3.6.5.tar.xz
     tar xf Python-3.6.5.tar.xz
 
-    case $yn in
-      [yY] ) /home/pi/Python-3.6.5/configure ;;
-      [nN] ) /home/pi/Python-3.6.5/configure --enable-optimizations ;;
+case $yn in
+      [nN] ) ./Python-3.6.5/configure ;;
+      [yY] ) ./Python-3.6.5/configure --enable-optimizations ;;
       * ) echo invalid response;
-        		exit 1;;
-    esac
-
+exit 1;;
+esac
     make -j -l 4
     make altinstall
-    reboot
+    echo “alias python3=/usr/local/bin/python3.6” >> ~/.bashrc
+    source ~/.bashrc
     python3 -m pip install --upgrade pip
     pip3 install azure-iot-device
     pip3 install six
-fi
+ fi
 
 
 echo "Username of SMS Eagle IoT Hub user:"
