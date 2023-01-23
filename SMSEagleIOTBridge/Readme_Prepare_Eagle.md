@@ -289,7 +289,7 @@ Mar 19 09:47:16 smseagle-dev systemd[1]: nyss-iot-bridge.service: main process e
 Mar 19 09:47:16 smseagle-dev systemd[1]: Unit nyss-iot-bridge.service entered failed state.
 ```
 This usually means you have forgotten to adjust the service file as described at the beginning of chapter, meaning the service is executing the python script with the wrong version of python where the azure module is not installed.
-Set 
+Go into the service file, and manually point it towards where the correct python version is located.
 
 ## Timezone is not UTC
 The SMS Eagle sends the timestamp without timezone information, which means we need it to be set to UTC to ensure we know the exact time when it reaches our server. We have validation in Nyss ensuring the timestamp is not in the future. If the timezone is ahead of UTC, this means the reports will be discarded as errors.
